@@ -61,19 +61,21 @@ export const Hero = () => {
   };
 
   console.log('Hero component rendered');
+  console.log('Hexagonal pattern breathing animation started');
 
   return (
     <section
       ref={containerRef}
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
     >
-      {/* Hexagonal Background Pattern */}
+      {/* Hexagonal Background Pattern with Brighter Breathing Effect */}
       <motion.div
         animate={{
-          opacity: [0.04, 0.06, 0.04],
+          opacity: [0.04, 0.09, 0.04],
+          scale: [1, 1.02, 1],
         }}
         transition={{
-          duration: 6,
+          duration: 8,
           repeat: Infinity,
           ease: 'easeInOut',
         }}
@@ -87,27 +89,31 @@ export const Hero = () => {
         >
           <defs>
             <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} /> {/* purple-400 */}
-              <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} /> {/* blue-400 */}
-              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} /> {/* white */}
+              <stop offset="0%" style={{ stopColor: '#C4B5FD', stopOpacity: 0.5 }} /> {/* purple-300 */}
+              <stop offset="25%" style={{ stopColor: '#A78BFA', stopOpacity: 0.4 }} /> {/* purple-400 */}
+              <stop offset="50%" style={{ stopColor: '#93C5FD', stopOpacity: 0.3 }} /> {/* blue-300 */}
+              <stop offset="75%" style={{ stopColor: '#BFDBFE', stopOpacity: 0.2 }} /> {/* blue-200 */}
+              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.15 }} /> {/* white */}
             </linearGradient>
             <pattern id="hexagons" x="0" y="0" width="20" height="17.32" patternUnits="userSpaceOnUse">
               <polygon
                 points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
                 fill="none"
                 stroke="url(#hex-gradient)"
-                strokeWidth="0.6"
+                strokeWidth="0.5"
               />
               <polygon
-                points="20,9.5 28.66,14.5 28.66,24.5 20,29.5 11.34,24.5 11.34,14.5"
+                points="22,10.66 30.66,15.66 30.66,25.66 22,30.66 13.34,25.66 13.34,15.66"
                 fill="none"
                 stroke="url(#hex-gradient)"
-                strokeWidth="0.4"
+                strokeWidth="0.3"
               />
             </pattern>
             <filter id="hex-glow">
               <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1.8" />
               <feMerge>
+                <feMergeNode />
                 <feMergeNode />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
