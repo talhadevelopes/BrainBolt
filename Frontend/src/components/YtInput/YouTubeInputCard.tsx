@@ -13,11 +13,9 @@ import {
   Eye,
   Zap,
   Microscope,
-
-
-
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 interface VideoMetadata {
   title: string;
@@ -91,7 +89,8 @@ export const YouTubeLearningPortal = () => {
   const [showTrackSelection, setShowTrackSelection] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<'Science' | 'Engineering' | null>(null);
   const [greeting, setGreeting] = useState('');
-  
+  const navigate = useNavigate();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const urlInputRef = useRef<HTMLInputElement>(null);
 
@@ -268,7 +267,7 @@ export const YouTubeLearningPortal = () => {
         // Store data for navigation
         localStorage.setItem('currentVideoId', videoId);
         localStorage.setItem('selectedTrack', track);
-
+console.log(track);
         // Reset UI to proceed forward
         setUrl('');
         setVideoMetadata(null);
@@ -276,9 +275,8 @@ export const YouTubeLearningPortal = () => {
         setShowTrackSelection(false);
         setSelectedTrack(null);
 
-        // Simulate navigation (uncomment if react-router-dom is available)
-        // navigate('/content', { state: { videoId, track } });
-
+        //  navigate('/content', { state: { videoId, track } });
+        track === "Science" ? navigate('/pcm', { state: { videoId, track } }) : navigate('/stem', { state: { videoId, track } });
         console.log(`Proceeding to content page with videoId: ${videoId}, track: ${track}`);
       }, 2000);
     } catch (error) {
