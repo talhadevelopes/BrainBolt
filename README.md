@@ -210,7 +210,8 @@ MIT License. See \[LICENSE].
 
 ## 📸 System Flow Diagram
 
-![Integrated System Flow](Frontend\public\deepseek_mermaid_20250613_4a65b6.svg)
+![Architecture Diagram](./Frontend/public/deepseek_mermaid_20250613_4a65b6.png)
+
 
 *End-to-end flow from ingestion, concept detection, module generation to gamified delivery.*
 
