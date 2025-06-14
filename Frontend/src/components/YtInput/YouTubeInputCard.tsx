@@ -8,13 +8,13 @@ import {
   Clock, 
   Download, 
   Upload, 
-  Trash2,
+  Trash2, 
   User,
   Eye,
   Zap,
   Microscope,
 
-  
+
 
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
