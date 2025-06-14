@@ -1,0 +1,54 @@
+services:
+  frontend:
+    image: talhadevelopes/brainbolt-frontend:latest
+    container_name: brainbolt-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - brainbolt-network
+    volumes:
+      - frontend-secrets:/app/secrets
+  backend:
+    image: talhadevelopes/brainbolt-backend:latest
+    container_name: brainbolt-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3000"
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/healthcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - brainbolt-network
+    volumes:
+      - backend-secrets:/app/secrets
+
+volumes:
+  frontend-secrets:
+  backend-secrets:
+
+networks:
+  brainbolt-network:
+    driver: bridge
