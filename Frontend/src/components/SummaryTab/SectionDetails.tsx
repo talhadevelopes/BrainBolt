@@ -81,7 +81,7 @@ export const SectionDetails = ({ section }: any) => (
               <motion.div
                 key={i}
                 className="p-4 bg-slate-800/20 border border-slate-700 rounded-xl group hover:border-cyan-400/30 transition-colors"
-                whileHover={{ translateX: 5 }}
+                whileHover={{ x: 5 }}
               >
                 <div className="flex items-start gap-3">
                   <div className="flex-shrink-0 w-6 h-6 bg-cyan-500/10 rounded-full flex items-center justify-center">
