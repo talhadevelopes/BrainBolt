@@ -10,7 +10,7 @@ export function MainLanding() {
   return (
     <div>
       <div className="absolute w-full rounded-none">
-        <Navbar title="AiDucate" icon={Home} />
+        <Navbar title="BrainBolt" icon={Home} />
       </div>
       <Hero />
       <Features />

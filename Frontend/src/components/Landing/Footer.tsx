@@ -7,7 +7,7 @@ export const Footer = () => {
     resources: ['Blog', 'Help Center', 'Guidelines'],
     legal: ['Privacy', 'Terms', 'Security'],
     social: [
-      { icon: <Github className="w-5 h-5" />, href: 'https://github.com/Mohfazam/AIDUCATE' },
+      { icon: <Github className="w-5 h-5" />, href: 'https://github.com/Mohfazam/BrainBolt' },
       { icon: <Twitter className="w-5 h-5" />, href: '#' },
       { icon: <Linkedin className="w-5 h-5" />, href: '#' },
       { icon: <Mail className="w-5 h-5" />, href: '#' }
@@ -24,7 +24,7 @@ export const Footer = () => {
             transition={{ duration: 0.8 }}
             className="col-span-1"
           >
-            <h3 className="text-2xl font-bold text-white mb-6">AIDUCATE</h3>
+            <h3 className="text-2xl font-bold text-white mb-6">BrainBolt</h3>
             <p className="text-gray-400 mb-6">
               Making learning fun and engaging through gamification and interactive experiences.
             </p>
@@ -74,7 +74,7 @@ export const Footer = () => {
           className="border-t border-gray-800 mt-12 pt-8 text-center"
         >
           <p className="text-gray-400">
-            © {new Date().getFullYear()} AIDUCATE. All rights reserved.
+            © {new Date().getFullYear()} BrainBolt. All rights reserved.
           </p>
         </motion.div>
       </div>
