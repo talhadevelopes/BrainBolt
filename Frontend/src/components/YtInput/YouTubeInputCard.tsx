@@ -48,9 +48,9 @@ const itemVariants: Variants = {
 };
 
 const toastVariants: Variants = {
-  initial: { opacity: 0, scale: 0.9 },
-  animate: { opacity: 1, scale: 1 },
-  exit: { opacity: 0, scale: 0.9 },
+  initial: { opacity: 0, x: 100 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: 100 },
 };
 
 const trackOptions = [
@@ -137,32 +137,10 @@ export const YouTubeLearningPortal = () => {
               initial="initial"
               animate="animate"
               exit="exit"
-              className="relative flex items-center gap-2 p-4 text-white"
+              className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
             >
-              <svg
-                className="absolute inset-0 w-full h-full"
-                viewBox="0 0 100 86.6"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                <polygon
-                  points="50,5 90,25 90,65 50,85 10,65 10,25"
-                  fill="rgba(255, 255, 255, 0.02)"
-                  stroke="url(#hex-gradient)"
-                  strokeWidth="1"
-                  className="backdrop-blur-sm"
-                />
-                <defs>
-                  <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                    <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                    <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                  </linearGradient>
-                </defs>
-              </svg>
-              <div className="relative z-10 flex items-center gap-2">
-                <Info className="w-5 h-5 text-blue-400" />
-                <span>YouTube URL detected and pasted!</span>
-              </div>
+              <Info className="w-5 h-5 text-blue-400" />
+              <span className="text-sm font-light text-white">YouTube URL detected and pasted!</span>
             </motion.div>,
             { autoClose: 3000 }
           );
@@ -244,32 +222,10 @@ export const YouTubeLearningPortal = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative flex items-center gap-2 p-4 text-white"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
           >
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox="0 0 100 86.6"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <polygon
-                points="50,5 90,25 90,65 50,85 10,65 10,25"
-                fill="rgba(255, 255, 255, 0.02)"
-                stroke="url(#hex-gradient)"
-                strokeWidth="1"
-                className="backdrop-blur-sm"
-              />
-              <defs>
-                <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                  <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                  <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="relative z-10 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-400" />
-              <span>Please enter a YouTube URL</span>
-            </div>
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Please enter a YouTube URL</span>
           </motion.div>,
           { autoClose: 3000 }
         );
@@ -285,32 +241,10 @@ export const YouTubeLearningPortal = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative flex items-center gap-2 p-4 text-white"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
           >
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox="0 0 100 86.6"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <polygon
-                points="50,5 90,25 90,65 50,85 10,65 10,25"
-                fill="rgba(255, 255, 255, 0.02)"
-                stroke="url(#hex-gradient)"
-                strokeWidth="1"
-                className="backdrop-blur-sm"
-              />
-              <defs>
-                <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                  <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                  <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="relative z-10 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-400" />
-              <span>Invalid YouTube URL</span>
-            </div>
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Invalid YouTube URL</span>
           </motion.div>,
           { autoClose: 3000 }
         );
@@ -328,32 +262,10 @@ export const YouTubeLearningPortal = () => {
           initial="initial"
           animate="animate"
           exit="exit"
-          className="relative flex items-center gap-2 p-4 text-white"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
         >
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 86.6"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <polygon
-              points="50,5 90,25 90,65 50,85 10,65 10,25"
-              fill="rgba(255, 255, 255, 0.02)"
-              stroke="url(#hex-gradient)"
-              strokeWidth="1"
-              className="backdrop-blur-sm"
-            />
-            <defs>
-              <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="relative z-10 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <span>Error processing video URL</span>
-          </div>
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-sm font-light text-white">Error processing video URL</span>
         </motion.div>,
         { autoClose: 3000 }
       );
@@ -375,32 +287,10 @@ export const YouTubeLearningPortal = () => {
           initial="initial"
           animate="animate"
           exit="exit"
-          className="relative flex items-center gap-2 p-4 text-white"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
         >
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 86.6"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <polygon
-              points="50,5 90,25 90,65 50,85 10,65 10,25"
-              fill="rgba(255, 255, 255, 0.02)"
-              stroke="url(#hex-gradient)"
-              strokeWidth="1"
-              className="backdrop-blur-sm"
-            />
-            <defs>
-              <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="relative z-10 flex items-center gap-2">
-            <CheckCircle2 className="w-5 h-5 text-green-400" />
-            <span>Video ID extracted and stored</span>
-          </div>
+          <CheckCircle2 className="w-5 h-5 text-green-400" />
+          <span className="text-sm font-light text-white">Video ID extracted and stored</span>
         </motion.div>,
         { autoClose: 3000 }
       );
@@ -411,32 +301,10 @@ export const YouTubeLearningPortal = () => {
           initial="initial"
           animate="animate"
           exit="exit"
-          className="relative flex items-center gap-2 p-4 text-white"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
         >
-          <svg
-            className="absolute inset-0 w-full h-full"
-            viewBox="0 0 100 86.6"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <polygon
-              points="50,5 90,25 90,65 50,85 10,65 10,25"
-              fill="rgba(255, 255, 255, 0.02)"
-              stroke="url(#hex-gradient)"
-              strokeWidth="1"
-              className="backdrop-blur-sm"
-            />
-            <defs>
-              <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="relative z-10 flex items-center gap-2">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <span>Error processing video</span>
-          </div>
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-sm font-light text-white">Error processing video</span>
         </motion.div>,
         { autoClose: 3000 }
       );
@@ -463,32 +331,10 @@ export const YouTubeLearningPortal = () => {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="relative flex items-center gap-2 p-4 text-white"
+        className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
       >
-        <svg
-          className="absolute inset-0 w-full h-full"
-          viewBox="0 0 100 86.6"
-          preserveAspectRatio="xMidYMid meet"
-        >
-          <polygon
-            points="50,5 90,25 90,65 50,85 10,65 10,25"
-            fill="rgba(255, 255, 255, 0.02)"
-            stroke="url(#hex-gradient)"
-            strokeWidth="1"
-            className="backdrop-blur-sm"
-          />
-          <defs>
-            <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-              <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-            </linearGradient>
-          </defs>
-        </svg>
-        <div className="relative z-10 flex items-center gap-2">
-          <CheckCircle2 className="w-5 h-5 text-green-400" />
-          <span>History exported successfully!</span>
-        </div>
+        <CheckCircle2 className="w-5 h-5 text-green-400" />
+        <span className="text-sm font-light text-white">History exported successfully!</span>
       </motion.div>,
       { autoClose: 3000 }
     );
@@ -515,32 +361,10 @@ export const YouTubeLearningPortal = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative flex items-center gap-2 p-4 text-white"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
           >
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox="0 0 100 86.6"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <polygon
-                points="50,5 90,25 90,65 50,85 10,65 10,25"
-                fill="rgba(255, 255, 255, 0.02)"
-                stroke="url(#hex-gradient)"
-                strokeWidth="1"
-                className="backdrop-blur-sm"
-              />
-              <defs>
-                <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                  <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                  <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="relative z-10 flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-green-400" />
-              <span>History imported successfully!</span>
-            </div>
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-light text-white">History imported successfully!</span>
           </motion.div>,
           { autoClose: 3000 }
         );
@@ -551,32 +375,10 @@ export const YouTubeLearningPortal = () => {
             initial="initial"
             animate="animate"
             exit="exit"
-            className="relative flex items-center gap-2 p-4 text-white"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
           >
-            <svg
-              className="absolute inset-0 w-full h-full"
-              viewBox="0 0 100 86.6"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              <polygon
-                points="50,5 90,25 90,65 50,85 10,65 10,25"
-                fill="rgba(255, 255, 255, 0.02)"
-                stroke="url(#hex-gradient)"
-                strokeWidth="1"
-                className="backdrop-blur-sm"
-              />
-              <defs>
-                <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                  <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                  <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-            <div className="relative z-10 flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-red-400" />
-              <span>Error importing history file</span>
-            </div>
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Error importing history file</span>
           </motion.div>,
           { autoClose: 3000 }
         );
@@ -882,32 +684,10 @@ export const YouTubeLearningPortal = () => {
                           initial="initial"
                           animate="animate"
                           exit="exit"
-                          className="relative flex items-center gap-2 p-4 text-white"
+                          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
                         >
-                          <svg
-                            className="absolute inset-0 w-full h-full"
-                            viewBox="0 0 100 86.6"
-                            preserveAspectRatio="xMidYMid meet"
-                          >
-                            <polygon
-                              points="50,5 90,25 90,65 50,85 10,65 10,25"
-                              fill="rgba(255, 255, 255, 0.02)"
-                              stroke="url(#hex-gradient)"
-                              strokeWidth="1"
-                              className="backdrop-blur-sm"
-                            />
-                            <defs>
-                              <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} />
-                                <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} />
-                                <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
-                              </linearGradient>
-                            </defs>
-                          </svg>
-                          <div className="relative z-10 flex items-center gap-2">
-                            <CheckCircle2 className="w-5 h-5 text-green-400" />
-                            <span>History cleared</span>
-                          </div>
+                          <CheckCircle2 className="w-5 h-5 text-green-400" />
+                          <span className="text-sm font-light text-white">History cleared</span>
                         </motion.div>,
                         { autoClose: 3000 }
                       );
