@@ -68,7 +68,7 @@ export const Hero = () => {
       ref={containerRef}
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
     >
-      {/* Hexagonal Background Pattern with Brighter Breathing Effect */}
+      {/* Hexagonal Background Pattern with Breathing Effect */}
       <motion.div
         animate={{
           opacity: [0.04, 0.09, 0.04],
@@ -231,6 +231,14 @@ export const Hero = () => {
             AI-Powered Learning
           </motion.div>
 
+          {/* Project Title */}
+          <motion.h2
+            variants={itemVariants}
+            className="text-3xl md:text-4xl font-medium bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text mb-6 backdrop-blur-sm"
+          >
+            BrainBolt
+          </motion.h2>
+
           {/* Hero headline - Apple style */}
           <motion.div variants={itemVariants} className="mb-6">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-4 tracking-tight leading-[0.9]">
@@ -299,18 +307,18 @@ export const Hero = () => {
             {[
               {
                 icon: <Brain className="w-6 h-6" />,
-                title: 'AI Generation',
-                desc: 'Automatically create quizzes and flashcards from any content',
+                title: 'AI-Powered Content',
+                desc: 'Automatically create quizzes and content from any source',
               },
               {
                 icon: <Target className="w-6 h-6" />,
-                title: 'Adaptive Learning',
-                desc: 'Personalized difficulty that evolves with your progress',
+                title: 'Personalized Learning',
+                desc: 'Adaptive difficulty that evolves with your progress',
               },
               {
                 icon: <TrendingUp className="w-6 h-6" />,
                 title: 'Gamified Progress',
-                desc: 'Earn achievements and track your learning journey',
+                desc: 'Track achievements and stay motivated',
               },
             ].map((item, index) => (
               <motion.div
