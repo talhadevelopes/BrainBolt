@@ -68,7 +68,7 @@ const trackOptions = [
     description: 'Apply science to design and build innovative solutions',
     icon: <Zap className="w-6 h-6" />,
     gradient: 'from-green-400 via-blue-400 to-purple-400',
-    subjects: ['Mechanical', 'Electrical', 'Civil', 'Computer', 'Chemical'],
+    subjects: ['Information Technology', 'CSE', 'EEE', 'ECE'],
   },
 ];
 
