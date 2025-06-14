@@ -1,10 +1,12 @@
 const express = require ("express");
-const STEMROuter = require("../STEM/stem")
+const STEMRouter = require("./STEM/stem")
+const GeneralRouter = require("./General/index")
 
 
 const MainRouter = express.Router();
 
 
-MainRouter.use("/STEM", STEMROuter);
+MainRouter.use("/STEM", STEMRouter);
+MainRouter.use("/General", GeneralRouter);
 
 module.exports = MainRouter;

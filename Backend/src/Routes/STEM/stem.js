@@ -9,11 +9,11 @@ dotenv.config({ path: path.resolve(__dirname, "../.env") });
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const app = express();
 
-const UserModel = require("../../models/UsersSchema");
+const UserModel = require("../../../models/UsersSchema");
 app.use(express.json());
 app.use(cors());
 
-const STEMROuter = express.Router();
+const STEMRouter = express.Router();
 
 const MONGOOSE_URL = process.env.MONGO_URL;
 const KEY1 = process.env.KEY1;
@@ -107,7 +107,7 @@ function getCacheStats() {
 
 
 
-STEMROuter.get("/Health", (req, res) => {
+STEMRouter.get("/Health", (req, res) => {
   res.json({
     msg: "Everything Works fine till now",
     cacheStats: getCacheStats()
@@ -115,13 +115,13 @@ STEMROuter.get("/Health", (req, res) => {
 });
 
 // Cache management endpoints (optional)
-STEMROuter.post("/ClearCache", (req, res) => {
+STEMRouter.post("/ClearCache", (req, res) => {
   const { videoId } = req.body;
   clearTranscriptCache(videoId);
   res.json({ success: true, message: videoId ? `Cache cleared for ${videoId}` : 'All cache cleared' });
 });
 
-STEMROuter.get("/Transcript", async (req, res) => {
+STEMRouter.get("/Transcript", async (req, res) => {
   try {
     const { videoId } = req.query;
     
@@ -170,11 +170,11 @@ STEMROuter.get("/Transcript", async (req, res) => {
   }
 });
 
-STEMROuter.get("/CacheStats", (req, res) => {
+STEMRouter.get("/CacheStats", (req, res) => {
   res.json(getCacheStats());
 });
 
-STEMROuter.post("/Signup", async (req, res) => {
+STEMRouter.post("/Signup", async (req, res) => {
   try {
     const username = req.body.username;
     const email = req.body.email;
@@ -199,7 +199,7 @@ STEMROuter.post("/Signup", async (req, res) => {
   }
 });
 
-STEMROuter.post("/Login", async (req, res) => {
+STEMRouter.post("/Login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
@@ -241,7 +241,7 @@ STEMROuter.post("/Login", async (req, res) => {
 
 //THEORY MASTER START
 
-STEMROuter.post("/Summary", async (req, res) => {
+STEMRouter.post("/Summary", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -299,7 +299,7 @@ STEMROuter.post("/Summary", async (req, res) => {
   }
 });
 
-STEMROuter.post("/SummaryMain", async (req, res) => {
+STEMRouter.post("/SummaryMain", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -405,7 +405,7 @@ STEMROuter.post("/SummaryMain", async (req, res) => {
   }
 });
 
-STEMROuter.post("/SummarySubPoints", async (req, res) => {
+STEMRouter.post("/SummarySubPoints", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -549,7 +549,7 @@ STEMROuter.post("/SummarySubPoints", async (req, res) => {
 
 //CODE DOJO
 
-STEMROuter.post("/CodeDojoEasy", async (req, res) => {
+STEMRouter.post("/CodeDojoEasy", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -682,7 +682,7 @@ STEMROuter.post("/CodeDojoEasy", async (req, res) => {
   }
 });
 
-STEMROuter.post("/CodeDojoMedium", async (req, res) => {
+STEMRouter.post("/CodeDojoMedium", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -847,7 +847,7 @@ function inorderTraversal(root) {
   }
 });
 
-STEMROuter.post("/CodeDojoHard", async (req, res) => {
+STEMRouter.post("/CodeDojoHard", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -1016,7 +1016,7 @@ STEMROuter.post("/CodeDojoHard", async (req, res) => {
   }
 });
 
-STEMROuter.post("/CodeDojoQuiz", async (req, res) => {
+STEMRouter.post("/CodeDojoQuiz", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -1170,7 +1170,7 @@ STEMROuter.post("/CodeDojoQuiz", async (req, res) => {
 
 // ========== KNOWLEDGE CHECK ENDPOINTS (UPDATED) ========== //
 
-STEMROuter.post("/KnowledgeCheckEasy", async (req, res) => {
+STEMRouter.post("/KnowledgeCheckEasy", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -1336,7 +1336,7 @@ STEMROuter.post("/KnowledgeCheckEasy", async (req, res) => {
   }
 });
 
-STEMROuter.post("/KnowledgeCheckMedium", async (req, res) => {
+STEMRouter.post("/KnowledgeCheckMedium", async (req, res) => {
   try {
     const { videoId } = req.body;
     
@@ -1502,7 +1502,7 @@ STEMROuter.post("/KnowledgeCheckMedium", async (req, res) => {
   }
 });
 
-STEMROuter.post("/KnowledgeCheckHard", async (req, res) => {
+STEMRouter.post("/KnowledgeCheckHard", async (req, res) => {
   try {
     const { videoId } = req.body;
 
@@ -1695,4 +1695,212 @@ STEMROuter.post("/KnowledgeCheckHard", async (req, res) => {
 });
 
 
-module.exports = STEMROuter;
+// Add this route after your existing routes
+STEMRouter.post("/BugHunter", async (req, res) => {
+  try {
+    const { videoId } = req.body;
+    
+    // Validate video ID format
+    if (!videoId || !videoId.match(/^[a-zA-Z0-9_-]{11}$/)) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Invalid YouTube video ID format",
+        example: "dQw4w9WgXcQ"
+      });
+    }
+
+    // Get transcript object
+    const transcriptResult = await getTranscript(videoId);
+    
+    // Extract text property
+    const transcriptText = transcriptResult.transcriptText;
+
+    // Validate transcript exists
+    if (!transcriptText || transcriptText.length < 100) {
+      return res.status(404).json({
+        success: false,
+        error: "Transcript unavailable or too short"
+      });
+    }
+
+    const genAI = new GoogleGenerativeAI(KEY2); // Using KEY2 for Gemini
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    // Truncate transcript if too long
+    const maxLength = 30000;
+    const truncatedText = transcriptText.length > maxLength 
+      ? transcriptText.substring(0, maxLength) 
+      : transcriptText;
+
+    const prompt = `Create a Bug Hunter coding challenge based on this video transcript.
+    
+    Requirements:
+    1. Generate flawed JavaScript code with 3-5 intentional bugs
+    2. Bugs should include: memory issues, logical errors, and edge case failures
+    3. Create debugging instructions
+    4. Provide 3 progressive hints
+    5. Include test cases that fail due to the bugs
+    6. Focus on concepts mentioned in the transcript
+    
+    Format EXACTLY like this:
+    Flawed Code:
+    [code with bugs]
+    
+    Instructions:
+    [What needs to be fixed]
+    
+    Hints:
+    1. [First hint]
+    2. [Second hint]
+    3. [Third hint]
+    
+    Test Cases:
+    - Test Case 1: [description]
+      Input: [value]
+      Expected: [value]
+    
+    - Test Case 2: [edge case description]
+      Input: [value]
+      Expected: [value]
+    
+    Transcript: ${truncatedText}`;
+
+    // Retry mechanism
+    let result;
+    const maxRetries = 3;
+    let attempt = 1;
+    
+    while (attempt <= maxRetries) {
+      try {
+        result = await model.generateContent(prompt, { timeout: 30000 });
+        break;
+      } catch (error) {
+        if (attempt === maxRetries) throw error;
+        console.log(`Retry attempt ${attempt} for video ${videoId}`);
+        await new Promise(resolve => setTimeout(resolve, 2000 * attempt));
+        attempt++;
+      }
+    }
+
+    const rawOutput = (await result.response).text();
+    
+    // Parse the response
+    const challengeData = {
+      flawedCode: '',
+      instructions: '',
+      hints: [],
+      testCases: []
+    };
+
+    // Extract sections with robust regex patterns
+    const codeMatch = rawOutput.match(/Flawed Code:\n([\s\S]*?)(?:\n\nInstructions:|\nInstructions:)/i);
+    if (codeMatch) challengeData.flawedCode = codeMatch[1].trim();
+
+    const instructionsMatch = rawOutput.match(/Instructions:\n([\s\S]*?)(?:\n\nHints:|\nHints:)/i);
+    if (instructionsMatch) challengeData.instructions = instructionsMatch[1].trim();
+
+    const hintsMatch = rawOutput.match(/Hints:\n([\s\S]*?)(?:\n\nTest Cases:|\nTest Cases:)/i);
+    if (hintsMatch) {
+      challengeData.hints = hintsMatch[1]
+        .split('\n')
+        .filter(line => line.trim().length > 0)
+        .map(line => line.replace(/^\d+\.\s*/, '').trim())
+        .filter(hint => hint.length > 0);
+    }
+
+    const testCasesMatch = rawOutput.match(/Test Cases:\n([\s\S]*)/i);
+    if (testCasesMatch) {
+      const testCasesText = testCasesMatch[1];
+      const testCaseBlocks = testCasesText.split(/\n\s*-\s*Test Case \d+:/i).slice(1);
+      
+      testCaseBlocks.forEach(block => {
+        const lines = block.split('\n').filter(l => l.trim());
+        if (lines.length >= 3) {
+          const description = lines[0].trim();
+          const inputLine = lines.find(l => l.trim().startsWith('Input:'));
+          const expectedLine = lines.find(l => l.trim().startsWith('Expected:'));
+          
+          if (inputLine && expectedLine) {
+            challengeData.testCases.push({
+              description,
+              input: inputLine.replace('Input:', '').trim(),
+              expected: expectedLine.replace('Expected:', '').trim()
+            });
+          }
+        }
+      });
+    }
+
+    // Add fallbacks if parsing failed
+    if (!challengeData.flawedCode) {
+      challengeData.flawedCode = `function buggySum(arr) {
+  let total = 0;
+  for (let i = 0; i <= arr.length; i++) {
+    total += arr[i];
+  }
+  return total;
+}`;
+    }
+
+    if (!challengeData.instructions) {
+      challengeData.instructions = "Fix the bugs in this array summation function";
+    }
+
+    if (challengeData.hints.length === 0) {
+      challengeData.hints = [
+        "Check the loop termination condition",
+        "What happens when the array is empty?",
+        "Consider how JavaScript handles undefined values"
+      ];
+    }
+
+    if (challengeData.testCases.length === 0) {
+      challengeData.testCases = [
+        {
+          description: "Basic functionality",
+          input: "[1, 2, 3]",
+          expected: "6"
+        },
+        {
+          description: "Edge case: empty array",
+          input: "[]",
+          expected: "0"
+        }
+      ];
+    }
+
+    res.status(200).json({
+      success: true,
+      challenge: challengeData,
+      videoId,
+      transcriptLength: transcriptText.length
+    });
+
+  } catch (error) {
+    console.error('BugHunter Error:', error);
+    
+    let statusCode = 500;
+    let errorMessage = "Failed to generate challenge";
+    
+    if (error.message.includes("transcript")) {
+      statusCode = 404;
+      errorMessage = "Transcript unavailable or too short";
+    } 
+    else if (error.message.includes("timeout") || error.name === "AbortError") {
+      statusCode = 504;
+      errorMessage = "Challenge generation timed out";
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      message: error.message.replace(/\[GoogleGenerativeAI Error\]:\s*/gi, ''),
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    });
+  }
+});
+
+
+
+
+module.exports = STEMRouter;
