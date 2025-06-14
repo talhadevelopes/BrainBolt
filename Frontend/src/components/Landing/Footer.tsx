@@ -174,7 +174,7 @@ export const Footer = () => {
           </motion.div>
 
           {/* Links sections */}
-          {['company', 'resources', 'legal'].map((section, sectionIndex) => (
+          {['company', 'resources', 'legal'].map((section) => (
             <motion.div
               key={section}
               variants={itemVariants}

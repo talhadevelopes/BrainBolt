@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import { Eye, EyeOff, UserPlus, AlertCircle, Check, ArrowRight } from 'lucide-react';
-import { useRef } from 'react';
 
 export const Signup = () => {
   const [formData, setFormData] = useState({
@@ -54,6 +53,19 @@ export const Signup = () => {
         ease: [0.25, 0.1, 0.25, 1]
       }
     }
+  };
+
+  const buttonVariants: Variants = {
+    hover: { 
+      scale: 1.02,
+      transition: { 
+        duration: 0.3,
+        type: "spring" as const,
+        stiffness: 500
+      } 
+    },
+    tap: { scale: 0.98 },
+    disabled: { opacity: 0.5 }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -527,8 +539,10 @@ export const Signup = () => {
                 <motion.button
                   type="submit"
                   disabled={isLoading}
-                  whileHover={isLoading ? {} : { scale: 1.02 }}
-                  whileTap={isLoading ? {} : { scale: 0.98 }}
+                  variants={buttonVariants}
+                  whileHover={isLoading ? {} : "hover"}
+                  whileTap={isLoading ? {} : "tap"}
+                  animate={isLoading ? "disabled" : {}}
                   className={`group relative w-full flex justify-center items-center gap-2 py-3 px-6 rounded-full text-base font-medium transition-all duration-300 ${
                     isLoading 
                       ? "bg-white/10 text-white/50 cursor-not-allowed" 
