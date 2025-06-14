@@ -57,36 +57,6 @@ graph LR
 
 ---
 
-## 🏗️ Architecture
-
-```mermaid
-flowchart TB
-  subgraph Client
-    FE[Web App (React + Tailwind)] -->|API| BE
-    FE --> Ext[Browser Extension]
-    FE --> Mobile[Flutter App]
-  end
-
-  subgraph Server
-    BE[Node.js + Express]
-    AI[AI Services: Llama, Gemini]
-    DB[(PostgreSQL / MongoDB)]
-    Cache[(Redis)]
-    Queue[(RabbitMQ)]
-  end
-
-  FE --> BE
-  Ext --> BE
-  Mobile --> BE
-  BE --> AI
-  BE --> DB
-  BE --> Cache
-  BE --> Queue
-
-  DB -->|Metrics| MetricsDB[(TimescaleDB)]
-```
-
----
 
 ## 🌟 Key Features
 
@@ -226,4 +196,3 @@ MIT License. See \[LICENSE].
 ---
 
 > “Learning isn’t about consuming content—it’s about transforming it into skills.”
->>>>>>> 1b2274f2adf54e8d50b5106abe59e791250413e1
