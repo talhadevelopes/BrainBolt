@@ -1,7 +1,5 @@
 # BrainBolt: GenAI‑Powered Active Learning Companion 📘
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE) [![Build Status](https://img.shields.io/github/actions/workflow/status/your-org/AI-Ducate/ci.yml)](https://github.com/your-org/AI-Ducate/actions) [![Coverage](https://img.shields.io/codecov/c/github/your-org/AI-Ducate)](https://codecov.io/gh/your-org/AI-Ducate)
-
 **Transform passive content into engaging, gamified learning experiences**
 
 ---
