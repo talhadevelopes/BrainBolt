@@ -6,10 +6,10 @@ export const Footer = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start end", "end start"]
+    offset: ['start end', 'end start'],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "10%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '10%']);
   const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0.5, 1, 1, 0.5]);
 
   const containerVariants: Variants = {
@@ -18,9 +18,9 @@ export const Footer = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants: Variants = {
@@ -30,9 +30,9 @@ export const Footer = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.1, 0.25, 1]
-      }
-    }
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    },
   };
 
   const links = {
@@ -43,17 +43,26 @@ export const Footer = () => {
       { icon: <Github className="w-5 h-5" />, href: 'https://github.com/Mohfazam/BrainBolt', label: 'GitHub' },
       { icon: <Twitter className="w-5 h-5" />, href: '#', label: 'Twitter' },
       { icon: <Linkedin className="w-5 h-5" />, href: '#', label: 'LinkedIn' },
-      { icon: <Mail className="w-5 h-5" />, href: '#', label: 'Email' }
-    ]
+      { icon: <Mail className="w-5 h-5" />, href: '#', label: 'Email' },
+    ],
   };
 
+  console.log('Footer component rendered');
+
   return (
-    <footer 
-      ref={containerRef}
-      className="relative py-20 overflow-hidden bg-black border-t border-white/[0.05]"
-    >
-      {/* Hexagonal Background Pattern - Same as Hero */}
-      <div className="absolute inset-0 opacity-[0.008]">
+    <footer ref={containerRef} className="relative py-20 overflow-hidden bg-black border-t border-white/[0.05]">
+      {/* Hexagonal Background Pattern */}
+      <motion.div
+        animate={{
+          opacity: [0.04, 0.06, 0.04],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        className="absolute inset-0 opacity-[0.05] z-0"
+      >
         <svg
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -61,34 +70,39 @@ export const Footer = () => {
           preserveAspectRatio="xMidYMid slice"
         >
           <defs>
-            <pattern
-              id="footer-hexagons"
-              x="0"
-              y="0"
-              width="20"
-              height="17.32"
-              patternUnits="userSpaceOnUse"
-            >
+            <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} /> {/* purple-400 */}
+              <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} /> {/* blue-400 */}
+              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} /> {/* white */}
+            </linearGradient>
+            <pattern id="footer-hexagons" x="0" y="0" width="20" height="17.32" patternUnits="userSpaceOnUse">
               <polygon
                 points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
                 fill="none"
-                stroke="white"
-                strokeWidth="0.5"
+                stroke="url(#hex-gradient)"
+                strokeWidth="0.6"
               />
               <polygon
                 points="20,9.5 28.66,14.5 28.66,24.5 20,29.5 11.34,24.5 11.34,14.5"
                 fill="none"
-                stroke="white"
-                strokeWidth="0.5"
+                stroke="url(#hex-gradient)"
+                strokeWidth="0.4"
               />
             </pattern>
+            <filter id="hex-glow">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+              <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          <rect width="100%" height="100%" fill="url(#footer-hexagons)" />
+          <rect width="100%" height="100%" fill="url(#footer-hexagons)" filter="url(#hex-glow)" />
         </svg>
-      </div>
+      </motion.div>
 
       {/* Subtle gradient overlay */}
-      <motion.div 
+      <motion.div
         style={{ y, opacity }}
         className="absolute inset-0 bg-gradient-to-t from-gray-900/5 via-transparent to-transparent"
       />
@@ -103,7 +117,7 @@ export const Footer = () => {
         transition={{
           duration: 30,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
         className="absolute w-[400px] h-[400px] -top-20 -right-20"
       >
@@ -115,14 +129,10 @@ export const Footer = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, margin: '-50px' }}
           className="grid grid-cols-1 md:grid-cols-5 gap-12 mb-16"
         >
-          {/* Brand section */}
-          <motion.div
-            variants={itemVariants}
-            className="md:col-span-2"
-          >
+          <motion.div variants={itemVariants} className="md:col-span-2">
             <div className="mb-6">
               <h3 className="text-2xl md:text-3xl font-light text-white mb-4 tracking-tight">
                 <span className="relative">
@@ -137,20 +147,17 @@ export const Footer = () => {
                     transition={{
                       duration: 8,
                       repeat: Infinity,
-                      ease: "easeInOut"
+                      ease: 'easeInOut',
                     }}
                     className="absolute -inset-1 bg-gradient-to-r from-blue-400/5 via-purple-400/5 to-pink-400/5 rounded-lg blur-lg -z-10"
                   />
                 </span>
               </h3>
             </div>
-            
             <p className="text-white/50 text-sm leading-relaxed mb-8 max-w-md font-light">
-              Making learning fun and engaging through gamification and interactive experiences. 
-              Transform any content into personalized learning journeys.
+              Making learning fun and engaging through gamification and interactive experiences. Transform any content into
+              personalized learning journeys.
             </p>
-
-            {/* Social links */}
             <div className="flex gap-4">
               {links.social.map((social, index) => (
                 <motion.a
@@ -158,31 +165,22 @@ export const Footer = () => {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ 
+                  whileHover={{
                     y: -2,
-                    transition: { duration: 0.2, ease: "easeOut" }
+                    transition: { duration: 0.2, ease: 'easeOut' },
                   }}
                   className="group p-2 rounded-xl bg-white/[0.02] border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-300"
                   aria-label={social.label}
                 >
-                  <div className="text-white/40 group-hover:text-white/70 transition-colors duration-300">
-                    {social.icon}
-                  </div>
+                  <div className="text-white/40 group-hover:text-white/70 transition-colors duration-300">{social.icon}</div>
                 </motion.a>
               ))}
             </div>
           </motion.div>
 
-          {/* Links sections */}
           {['company', 'resources', 'legal'].map((section) => (
-            <motion.div
-              key={section}
-              variants={itemVariants}
-              className="md:col-span-1"
-            >
-              <h4 className="text-white font-medium mb-6 capitalize text-sm tracking-wide">
-                {section}
-              </h4>
+            <motion.div key={section} variants={itemVariants} className="md:col-span-1">
+              <h4 className="text-white font-medium mb-6 capitalize text-sm tracking-wide">{section}</h4>
               <ul className="space-y-4">
                 {/* @ts-ignore */}
                 {links[section].map((link, linkIndex) => (
@@ -200,7 +198,6 @@ export const Footer = () => {
           ))}
         </motion.div>
 
-        {/* Bottom section */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -212,10 +209,7 @@ export const Footer = () => {
             variants={itemVariants}
             className="flex flex-col md:flex-row justify-between items-center gap-4"
           >
-            <p className="text-white/30 text-sm font-light">
-              © {new Date().getFullYear()} BrainBolt. All rights reserved.
-            </p>
-            
+            <p className="text-white/30 text-sm font-light">© {new Date().getFullYear()} BrainBolt. All rights reserved.</p>
             <div className="flex items-center gap-6 text-white/30 text-sm font-light">
               <span>Built for retention.</span>
               <span className="w-1 h-1 bg-white/20 rounded-full"></span>
