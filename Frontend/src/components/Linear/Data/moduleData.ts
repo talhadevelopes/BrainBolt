@@ -1,3 +1,5 @@
+import { LucideIcon } from "lucide-react";
+
 export type ModuleType = 
   | 'JEE Accelerator' 
   | 'Formula Fusion' 
@@ -7,20 +9,26 @@ export type ModuleType =
 
 export interface ModuleData {
   id: string;
+  name: string;
   type: ModuleType;
-  title: string;
+  title?: string; // Make optional since steam store uses name
   description: string;
-  icon: string;
+  icon: LucideIcon | string; // Allow both LucideIcon and string
   content: any;
+  timestamp: number; // Fix: was missing type
+  topic?: string; // Add topic field used in steam store
 }
 
 export const moduleData: ModuleData[] = [
   {
     id: 'jee-1',
+    name: 'JEE Main Physics Problems',
     type: 'JEE Accelerator',
     title: 'JEE Main Physics Problems',
     description: 'Curated previous year problems with detailed solutions',
     icon: '📚',
+    timestamp: 30,
+    topic: 'Physics',
     content: {
       problems: [
         {
@@ -96,10 +104,13 @@ export const moduleData: ModuleData[] = [
   },
   {
     id: 'formula-1',
+    name: 'Electromagnetic Field Equations',
     type: 'Formula Fusion',
     title: 'Electromagnetic Field Equations',
     description: 'Step-by-step derivation of Maxwell\'s equations',
     icon: '∫',
+    timestamp: 60,
+    topic: 'Physics',
     content: {
       derivations: [
         {
@@ -196,10 +207,13 @@ export const moduleData: ModuleData[] = [
   },
   {
     id: '3d-1',
+    name: 'Organic Chemistry Structures',
     type: '3D Explorer',
     title: 'Organic Chemistry Structures',
     description: 'Interactive 3D models of organic molecules',
     icon: '⚛️',
+    timestamp: 90,
+    topic: 'Chemistry',
     content: {
       molecules: [
         {
@@ -280,10 +294,13 @@ export const moduleData: ModuleData[] = [
   },
   {
     id: 'proof-1',
+    name: 'Number Theory Proofs',
     type: 'Proof Builder',
     title: 'Number Theory Proofs',
     description: 'Construct rigorous mathematical proofs step by step',
     icon: '𝛿',
+    timestamp: 120,
+    topic: 'Mathematics',
     content: {
       theorems: [
         {
@@ -355,10 +372,13 @@ export const moduleData: ModuleData[] = [
   },
   {
     id: 'numerical-1',
+    name: 'Engineering Mathematics',
     type: 'Numerical Navigator',
     title: 'Engineering Mathematics',
     description: 'Solve complex engineering calculations with step-by-step guidance',
     icon: '🧮',
+    timestamp: 150,
+    topic: 'Engineering',
     content: {
       problems: [
         {
@@ -491,7 +511,7 @@ export const moduleData: ModuleData[] = [
 export const allModules = moduleData.map(module => ({
   id: module.id,
   type: module.type,
-  title: module.title,
+  title: module.title || module.name,
   description: module.description,
   icon: module.icon
 }));
