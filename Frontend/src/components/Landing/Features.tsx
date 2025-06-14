@@ -38,12 +38,12 @@ export const Features = () => {
 
   const navigate = useNavigate();
 
-  const handleNavigate = (path: string) => {
+  const handleNavigate = () => {
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (isAuthenticated) {
-      navigate(path);
+      navigate('/input');
     } else {
-      const nestedRedirect = encodeURIComponent(`/login?redirect=${path}`);
+      const nestedRedirect = encodeURIComponent(`/login?redirect=/input`);
       navigate(`/signup?redirect=${nestedRedirect}`);
     }
   };
@@ -262,19 +262,16 @@ export const Features = () => {
               icon: <Code className="w-6 h-6" />,
               title: 'Code Dojo',
               desc: 'Hone your coding skills with real-time feedback and interactive challenges tailored to your level.',
-              path: '/code',
             },
             {
               icon: <BookOpen className="w-6 h-6" />,
               title: 'Knowledge Check',
               desc: 'Test your understanding with AI-generated quizzes and flashcards from any content.',
-              path: '/kc',
             },
             {
               icon: <Trophy className="w-6 h-6" />,
               title: 'Competitive Arena',
               desc: 'Challenge peers in head-to-head coding battles and climb the leaderboards.',
-              path: '/cp',
             },
           ].map((item, index) => (
             <motion.div
@@ -329,14 +326,28 @@ export const Features = () => {
                 <div className="text-white/60 mb-4 group-hover:text-white/80 transition-colors duration-300">
                   {item.icon}
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2 group-hover:text-white transition-colors duration-300">
-                  {item.title}
+                <h3 className="relative text-lg font-medium mb-2">
+                  <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
+                    {item.title}
+                  </span>
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.02, 1],
+                      opacity: [0.2, 0.4, 0.2],
+                    }}
+                    transition={{
+                      duration: 6,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }}
+                    className="absolute -inset-2 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-pink-400/10 rounded-lg blur-xl -z-10"
+                  />
                 </h3>
                 <p className="text-white/50 text-sm leading-relaxed mb-6 group-hover:text-white/70 transition-colors duration-300">
                   {item.desc}
                 </p>
                 <motion.button
-                  onClick={() => handleNavigate(item.path)}
+                  onClick={handleNavigate}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   className="group/button flex items-center gap-2 text-white/60 text-sm font-medium hover:text-white transition-colors duration-300"
