@@ -1,12 +1,5 @@
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
-import { 
-  Brain, 
-  Target, 
-  TrendingUp, 
-  PlayCircle, 
-  ArrowRight,
-  ChevronDown
-} from 'lucide-react';
+import { Brain, Target, TrendingUp, ArrowRight, ChevronDown } from 'lucide-react';
 import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,10 +7,10 @@ export const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start start", "end start"]
+    offset: ['start start', 'end start'],
   });
 
-  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const y = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
 
   const containerVariants: Variants = {
@@ -26,9 +19,9 @@ export const Hero = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.08,
-        delayChildren: 0.1
-      }
-    }
+        delayChildren: 0.1,
+      },
+    },
   };
 
   const itemVariants: Variants = {
@@ -38,9 +31,21 @@ export const Hero = () => {
       y: 0,
       transition: {
         duration: 0.6,
-        ease: [0.25, 0.1, 0.25, 1]
-      }
-    }
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    },
+  };
+
+  const badgeVariants: Variants = {
+    hidden: { opacity: 0, scale: 0.8 },
+    visible: {
+      opacity: 1,
+      scale: 1,
+      transition: {
+        duration: 0.8,
+        ease: [0.25, 0.1, 0.25, 1],
+      },
+    },
   };
 
   const navigate = useNavigate();
@@ -55,12 +60,10 @@ export const Hero = () => {
     }
   };
 
-  const handleWatchDemo = () => {
-    console.log('Watch Demo clicked');
-  };
+  console.log('Hero component rendered');
 
   return (
-    <section 
+    <section
       ref={containerRef}
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
     >
@@ -72,7 +75,7 @@ export const Hero = () => {
         transition={{
           duration: 6,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
         className="absolute inset-0 opacity-[0.05] z-0"
       >
@@ -88,14 +91,7 @@ export const Hero = () => {
               <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} /> {/* blue-400 */}
               <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} /> {/* white */}
             </linearGradient>
-            <pattern
-              id="hexagons"
-              x="0"
-              y="0"
-              width="20"
-              height="17.32"
-              patternUnits="userSpaceOnUse"
-            >
+            <pattern id="hexagons" x="0" y="0" width="20" height="17.32" patternUnits="userSpaceOnUse">
               <polygon
                 points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
                 fill="none"
@@ -131,7 +127,7 @@ export const Hero = () => {
         transition={{
           duration: 20,
           repeat: Infinity,
-          ease: "linear"
+          ease: 'linear',
         }}
         className="absolute top-20 right-20 opacity-[0.02]"
       >
@@ -160,7 +156,7 @@ export const Hero = () => {
         transition={{
           duration: 25,
           repeat: Infinity,
-          ease: "linear"
+          ease: 'linear',
         }}
         className="absolute bottom-32 left-16 opacity-[0.015]"
       >
@@ -175,11 +171,11 @@ export const Hero = () => {
       </motion.div>
 
       {/* Subtle gradient overlay */}
-      <motion.div 
+      <motion.div
         style={{ y, opacity }}
         className="absolute inset-0 bg-gradient-to-b from-gray-900/10 via-transparent to-transparent"
       />
-      
+
       {/* Minimal floating elements with hexagonal inspiration */}
       <motion.div
         animate={{
@@ -190,7 +186,7 @@ export const Hero = () => {
         transition={{
           duration: 12,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
         className="absolute w-[600px] h-[600px] -top-80 -right-80"
       >
@@ -206,7 +202,7 @@ export const Hero = () => {
         transition={{
           duration: 15,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: 'easeInOut',
         }}
         className="absolute w-[500px] h-[500px] -bottom-80 -left-80"
       >
@@ -222,10 +218,10 @@ export const Hero = () => {
         >
           {/* Minimal badge with hexagonal accent */}
           <motion.div
-            variants={itemVariants}
-            className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-8 backdrop-blur-sm"
+            variants={badgeVariants}
+            className="inline-flex items-center gap-2 px-2.5 py-0.5 bg-white/3 border border-white/5 rounded-full text-white/60 text-xs font-medium mb-12 backdrop-blur-sm"
           >
-            <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse-slow" />
+            <div className="w-1.5 h-1.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse-slow" />
             AI-Powered Learning
           </motion.div>
 
@@ -248,7 +244,7 @@ export const Hero = () => {
                   transition={{
                     duration: 4,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: 'easeInOut',
                   }}
                   className="absolute -inset-2 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-pink-400/10 rounded-lg blur-xl -z-10"
                 />
@@ -263,7 +259,7 @@ export const Hero = () => {
           >
             Transform any content into engaging, personalized learning experiences
           </motion.p>
-          
+
           <motion.p
             variants={itemVariants}
             className="text-lg text-white/40 mb-12 max-w-2xl mx-auto font-light"
@@ -271,10 +267,10 @@ export const Hero = () => {
             Powered by AI. Designed for retention.
           </motion.p>
 
-          {/* CTA Buttons - Apple style */}
+          {/* CTA Button - Apple style */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-4 justify-center mb-20"
+            className="flex justify-center mb-20"
           >
             <motion.button
               onClick={handleGetStarted}
@@ -287,46 +283,36 @@ export const Hero = () => {
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
               </span>
             </motion.button>
-            
-            <motion.button
-              onClick={handleWatchDemo}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="group px-8 py-3 border border-white/20 rounded-full text-white font-medium text-lg hover:border-white/40 transition-all duration-300 flex items-center gap-2 justify-center backdrop-blur-sm"
-            >
-              <PlayCircle className="w-4 h-4" />
-              Watch Demo
-            </motion.button>
           </motion.div>
 
           {/* Feature showcase - minimal cards with hexagonal accents */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-1 max-w-5xl mx-auto mb-20"
+            className="grid grid-cols-1 md:grid-cols-3 gap-1 max-w-5xl mx-auto mb-12"
           >
             {[
-              { 
-                icon: <Brain className="w-6 h-6" />, 
-                title: "AI Generation", 
-                desc: "Automatically create quizzes and flashcards from any content"
+              {
+                icon: <Brain className="w-6 h-6" />,
+                title: 'AI Generation',
+                desc: 'Automatically create quizzes and flashcards from any content',
               },
-              { 
-                icon: <Target className="w-6 h-6" />, 
-                title: "Adaptive Learning", 
-                desc: "Personalized difficulty that evolves with your progress"
+              {
+                icon: <Target className="w-6 h-6" />,
+                title: 'Adaptive Learning',
+                desc: 'Personalized difficulty that evolves with your progress',
               },
-              { 
-                icon: <TrendingUp className="w-6 h-6" />, 
-                title: "Gamified Progress", 
-                desc: "Earn achievements and track your learning journey"
-              }
+              {
+                icon: <TrendingUp className="w-6 h-6" />,
+                title: 'Gamified Progress',
+                desc: 'Earn achievements and track your learning journey',
+              },
             ].map((item, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
-                whileHover={{ 
+                whileHover={{
                   y: -2,
-                  transition: { duration: 0.2, ease: "easeOut" }
+                  transition: { duration: 0.2, ease: 'easeOut' },
                 }}
                 className="group relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
               >
@@ -338,7 +324,7 @@ export const Hero = () => {
                   transition={{
                     duration: 6,
                     repeat: Infinity,
-                    ease: "easeInOut"
+                    ease: 'easeInOut',
                   }}
                   className="absolute inset-0 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-500"
                 >
@@ -368,7 +354,7 @@ export const Hero = () => {
                     />
                   </svg>
                 </motion.div>
-                
+
                 <div className="relative z-10">
                   <div className="text-white/60 mb-4 group-hover:text-white/80 transition-colors duration-300">
                     {item.icon}
@@ -383,38 +369,13 @@ export const Hero = () => {
               </motion.div>
             ))}
           </motion.div>
-
-          {/* Stats - Apple's minimal approach */}
-          <motion.div
-            variants={itemVariants}
-            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-16"
-          >
-            {[
-              { stat: "10K+", label: "Active Learners" },
-              { stat: "50K+", label: "Courses Created" },
-              { stat: "85%", label: "Retention Rate" },
-              { stat: "3x", label: "Faster Learning" }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ y: -1 }}
-                className="text-center group cursor-default"
-              >
-                <div className="text-2xl md:text-3xl font-light text-white mb-1 group-hover:text-white transition-colors">
-                  {item.stat}
-                </div>
-                <div className="text-sm text-white/40 font-light">{item.label}</div>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
       </div>
 
       {/* Minimal scroll indicator */}
       <motion.div
         animate={{ y: [0, 8, 0] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/30"
       >
         <ChevronDown className="w-6 h-6" />
