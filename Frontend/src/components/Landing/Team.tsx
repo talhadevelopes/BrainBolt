@@ -74,7 +74,7 @@ export const Team = () => {
             variants={textGlow}
             className="text-4xl md:text-5xl font-bold text-white"
           >
-            AIDUCATE
+            BrainBolt
           </motion.h1>
           <p className="text-xl text-gray-400">Unified Excellence in Technical Innovation</p>
         </motion.div>

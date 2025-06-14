@@ -7,7 +7,7 @@ export const Testimonials = () => {
     {
       name: "Alex Thompson",
       role: "Software Engineer",
-      quote: "AIDUCATE transformed how I approach learning. The gamification elements make even complex topics engaging and fun.",
+      quote: "BrainBolt transformed how I approach learning. The gamification elements make even complex topics engaging and fun.",
       rating: 5,
       color: "from-purple-500 to-pink-500"
     },
@@ -21,7 +21,7 @@ export const Testimonials = () => {
     {
       name: "James Wilson",
       role: "Teacher",
-      quote: "As an educator, I've seen firsthand how AIDUCATE increases student engagement and retention.",
+      quote: "As an educator, I've seen firsthand how BrainBolt increases student engagement and retention.",
       rating: 5,
       color: "from-green-500 to-emerald-500"
     },
@@ -35,7 +35,7 @@ export const Testimonials = () => {
     {
       name: "David Chen",
       role: "Data Scientist",
-      quote: "AIDUCATE's AI-powered feedback on my coding exercises was incredibly helpful. It's like having a personal tutor available 24/7.",
+      quote: "BrainBolt's AI-powered feedback on my coding exercises was incredibly helpful. It's like having a personal tutor available 24/7.",
       rating: 5,
       color: "from-amber-500 to-yellow-500"
     },
@@ -173,13 +173,14 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          {/* @ts-ignore */}
           <motion.div variants={itemVariants}>
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
               What Our Users
               <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text"> Say</span>
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Join thousands of satisfied learners who have transformed their educational journey with AIDUCATE.
+              Join thousands of satisfied learners who have transformed their educational journey with BrainBolt.
             </p>
           </motion.div>
         </motion.div>
