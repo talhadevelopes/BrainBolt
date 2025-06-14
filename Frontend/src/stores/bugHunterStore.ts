@@ -457,7 +457,7 @@ const generateDynamicChallenge = (transcript: string, videoId: string): BugHunte
       lowerTranscript.includes("average"),
   }
 
-  // Generate challenge based on detected concepts
+  // Generate challenge based on detected 
   if (concepts.sorting) {
     return generateSortingChallenge(transcript, videoId)
   } else if (concepts.recursion) {
