@@ -4,19 +4,20 @@ import {
   ArrowRight, 
   Loader, 
   CheckCircle2, 
-  Search,  
+  Search, 
+  Clock, 
   Download, 
   Upload, 
   Trash2, 
+  User,
+  Eye,
   Zap,
   Microscope,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { History } from './History';
 
 interface HistoryItem {
-  track: string;
   url: string;
   timestamp: number;
 }
@@ -135,15 +136,12 @@ export const YouTubeLearningPortal = () => {
       const newHistory = [...history];
       newHistory.splice(existingIndex, 1);
       updatedHistory = [
-        {
-          url: urlToSave, timestamp: Date.now(),
-          track: ''
-        },
+        { url: urlToSave, timestamp: Date.now() },
         ...newHistory,
       ];
     } else {
       updatedHistory = [
-        { url: urlToSave, timestamp: Date.now(), track: '' },
+        { url: urlToSave, timestamp: Date.now() },
         ...history,
       ].slice(0, 20);
     }
@@ -175,7 +173,8 @@ export const YouTubeLearningPortal = () => {
       timeoutId = setTimeout(() => {
         localStorage.setItem('currentVideoId', videoId);
         localStorage.setItem('selectedTrack', selectedTrack);
-        navigate('/content', { state: { videoId, track: selectedTrack } });
+        const route = selectedTrack === 'Engineering' ? '/stem' : '/pcm';
+        navigate(route, { state: { videoId, track: selectedTrack } });
       }, 3000);
     }
     return () => clearTimeout(timeoutId);
@@ -221,6 +220,9 @@ export const YouTubeLearningPortal = () => {
     }
   };
 
+  const filteredHistory = history.filter(item =>
+    item.url.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleExportHistory = () => {
     const dataStr = JSON.stringify(history, null, 2);
@@ -530,8 +532,8 @@ export const YouTubeLearningPortal = () => {
             variants={itemVariants}
             className="space-y-6"
           >
-            {/* History Card */}
-            <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
+            {/* Learning History Card */}
+            <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] relative z-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-light">Learning History</h2>
                 <div className="flex gap-2">
@@ -563,7 +565,6 @@ export const YouTubeLearningPortal = () => {
                 </div>
               </div>
 
-              {/* Search */}
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
                 <input
@@ -575,11 +576,32 @@ export const YouTubeLearningPortal = () => {
                 />
               </div>
 
-              {/* History Component */}
-              <History
-                onSelectUrl={setUrl}
-                currentUrl={url}
-              />
+              <div className="mt-4 max-h-96 overflow-y-auto">
+                {filteredHistory.length > 0 ? (
+                  filteredHistory.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="p-3 mb-2 rounded-lg bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all cursor-pointer"
+                      onClick={() => setUrl(item.url)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white truncate">{item.url}</p>
+                          <div className="flex items-center mt-1 text-xs text-white/60">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {new Date(item.timestamp).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-white/60 text-sm text-center">No history available</p>
+                )}
+              </div>
             </div>
 
             {/* Stats Card */}
