@@ -3,27 +3,17 @@ import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   ArrowRight, 
   Loader, 
-  CheckCircle2, 
-  X, 
-  Plus, 
+  CheckCircle2,  
   Search, 
   Clock, 
   Download, 
   Upload, 
   Trash2,
-  Play,
   User,
-  Calendar,
   Eye,
-  Copy,
-  ExternalLink,
   Zap,
-  BookOpen,
-  Calculator,
   Microscope,
-  Stethoscope,
-  Atom,
-  ChevronDown
+
 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 
@@ -88,14 +78,14 @@ const trackOptions = [
 
 export const YouTubeLearningPortal = () => {
   const [url, setUrl] = useState('');
-  const [batchUrls, setBatchUrls] = useState(['']);
+  const [] = useState(['']);
   const [videoId, setVideoId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isValidUrl, setIsValidUrl] = useState(false);
   const [videoMetadata, setVideoMetadata] = useState<VideoMetadata | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [] = useState(false);
   const [showTrackSelection, setShowTrackSelection] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<'Science' | 'Engineering' | null>(null);
   const [greeting, setGreeting] = useState('');
