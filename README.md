@@ -204,6 +204,14 @@ We follow the \[Contributor Covenant v2.1]. Please be respectful and inclusive.
 
 ## 📄 License
 
+<<<<<<< HEAD
+This project is licensed under the [MIT License](./LICENSE).
+
+---
+
+> “The internet has enough content. It’s time we made it *stick*.”
+
+=======
 MIT License. See \[LICENSE].
 
 ---
@@ -218,3 +226,4 @@ MIT License. See \[LICENSE].
 ---
 
 > “Learning isn’t about consuming content—it’s about transforming it into skills.”
+>>>>>>> 1b2274f2adf54e8d50b5106abe59e791250413e1
