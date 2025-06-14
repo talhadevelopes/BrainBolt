@@ -141,6 +141,133 @@ GeneralRouter.get("/Transcript", async (req, res) => {
   }
 });
 
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.KEY3);
+
+GeneralRouter.post("/KeyConcepts", async (req, res) => {
+  try {
+    const { videoId } = req.body;
+    
+    // Validate video ID format
+    if (!videoId || !videoId.match(/^[a-zA-Z0-9_-]{11}$/)) {
+      return res.status(400).json({ 
+        success: false,
+        error: "Invalid YouTube video ID format",
+        example: "dQw4w9WgXcQ"
+      });
+    }
+
+    // Get transcript object
+    const transcriptResult = await getTranscript(videoId);
+    const fullTranscript = transcriptResult.fullTranscript;
+    
+    // Validate transcript exists
+    if (!fullTranscript || fullTranscript.length === 0) {
+      return res.status(404).json({
+        success: false,
+        error: "Transcript unavailable for this video"
+      });
+    }
+
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // Format transcript for analysis
+    const formattedTranscript = fullTranscript.map(item => 
+      `[${Math.floor(item.start)}s] ${item.text}`
+    ).join("\n");
+
+    // Truncate to avoid token limits
+    const maxLength = 30000;
+    const truncatedTranscript = formattedTranscript.length > maxLength 
+      ? formattedTranscript.substring(0, maxLength) + "... [truncated]" 
+      : formattedTranscript;
+
+    const prompt = `Analyze this video transcript with timestamps and identify key concepts with their end times.
+    
+    Requirements:
+    1. Identify 5-8 main concepts discussed in the video
+    2. For each concept, determine the end timestamp (in seconds) when the concept discussion ends
+    3. Provide a concise name for each concept (2-5 words)
+    4. Return only the concepts array in JSON format
+    
+    Output MUST be EXACTLY this format:
+    [
+      {
+        "timestamp": 123.45,  // End time in seconds
+        "name": "Concept Name"
+      },
+      ...
+    ]
+    
+    Guidelines:
+    - Timestamps should be whole numbers (seconds)
+    - Concepts should be distinct and significant
+    - Ignore introductions and conclusions
+    
+    Transcript with timestamps:
+    ${truncatedTranscript}`;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const rawOutput = (await result.response).text();
+    
+    // Extract JSON array from response
+    const arrayStart = rawOutput.indexOf('[');
+    const arrayEnd = rawOutput.lastIndexOf(']') + 1;
+    const arrayString = rawOutput.slice(arrayStart, arrayEnd);
+    let concepts = JSON.parse(arrayString);
+
+    // Validate and process concepts
+    concepts = concepts
+      .filter(concept => 
+        concept.timestamp >= 0 && 
+        concept.name && 
+        concept.name.trim().length > 0
+      )
+      .map(concept => ({
+        timestamp: Math.floor(concept.timestamp),
+        name: concept.name.trim()
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+
+    // Add fallback if no concepts found
+    if (concepts.length === 0) {
+      const videoDuration = Math.max(...fullTranscript.map(t => t.start + t.duration));
+      concepts = [
+        { timestamp: Math.floor(videoDuration * 0.3), name: "Core Concept 1" },
+        { timestamp: Math.floor(videoDuration * 0.6), name: "Core Concept 2" },
+        { timestamp: Math.floor(videoDuration * 0.9), name: "Conclusion" }
+      ];
+    }
+
+    res.status(200).json({
+      success: true,
+      concepts,
+      videoId,
+      conceptCount: concepts.length
+    });
+
+  } catch (error) {
+    console.error("KeyConcepts Error:", error);
+    
+    let statusCode = 500;
+    let errorMessage = "Failed to extract key concepts";
+    
+    if (error.message.includes("Transcript not available")) {
+      statusCode = 404;
+      errorMessage = "Transcript unavailable";
+    } 
+    else if (error.message.includes("JSON")) {
+      errorMessage = "Failed to parse concept data";
+    }
+    
+    res.status(statusCode).json({
+      success: false,
+      error: errorMessage,
+      message: error.message
+    });
+  }
+});
 
 
 
