@@ -1,18 +1,14 @@
 import { motion, useScroll, useTransform, Variants } from 'framer-motion';
 import { 
   Brain, 
-  Zap, 
   Target, 
   TrendingUp, 
   PlayCircle, 
-  Sparkles,
   ArrowRight,
-  BookOpen,
-  Users,
-  Trophy,
   ChevronDown
 } from 'lucide-react';
 import { useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const Hero = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -47,8 +43,16 @@ export const Hero = () => {
     }
   };
 
+  const navigate = useNavigate();
+
   const handleGetStarted = () => {
-    console.log('Get Started clicked');
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (isAuthenticated) {
+      navigate('/input');
+    } else {
+      const nestedRedirect = encodeURIComponent('/login?redirect=/input');
+      navigate(`/signup?redirect=${nestedRedirect}`);
+    }
   };
 
   const handleWatchDemo = () => {
