@@ -15,7 +15,7 @@ import {
   Microscope,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HistoryItem {
   url: string;
@@ -66,6 +66,7 @@ const trackOptions = [
 
 export const YouTubeLearningPortal = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [url, setUrl] = useState('');
   const [videoId, setVideoId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +80,7 @@ export const YouTubeLearningPortal = () => {
   const urlInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Initial setup: greeting, focus, history loading
   useEffect(() => {
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good morning! Ready to learn something new?');
@@ -108,14 +110,19 @@ export const YouTubeLearningPortal = () => {
         console.error('Error parsing history:', error);
       }
     }
-
-    navigator.clipboard.readText().then(text => {
-      if (text.includes('youtube.com/') || text.includes('youtu.be/')) {
-        setUrl(text);
-        toast.info('YouTube URL detected and pasted!');
-      }
-    }).catch(() => {});
   }, []);
+
+  // Autopaste when route changes to /input
+  useEffect(() => {
+    if (location.pathname === '/input') {
+      navigator.clipboard.readText().then(text => {
+        if (isValidYouTubeUrl(text)) {
+          setUrl(text);
+          toast.info('YouTube URL detected and pasted!');
+        }
+      }).catch(() => {});
+    }
+  }, [location.pathname]);
 
   const isValidYouTubeUrl = (url: string): boolean => {
     const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
