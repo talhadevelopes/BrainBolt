@@ -55,7 +55,6 @@ export const Login = () => {
     e.preventDefault();
     setError('');
 
-    // Basic validation
     if (!username || !password) {
       setError('Please fill in all fields');
       return;
@@ -70,18 +69,13 @@ export const Login = () => {
       });
 
       if (response.data.success) {
-        // Store authentication state
         localStorage.setItem('isAuthenticated', 'true');
-        // Store user data in local storage
         localStorage.setItem('userData', JSON.stringify({
           username,
-          ...response.data.user // Assuming the API returns user data in response.data.user
+          ...response.data.user
         }));
 
-        // Show success message
         toast.success('Login successful!');
-
-        // Redirect after a short delay
         setTimeout(() => {
           navigate(redirectAfterLogin);
         }, 1500);
@@ -99,7 +93,7 @@ export const Login = () => {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black py-12"
     >
       <ToastContainer 
         position="top-right" 
@@ -113,8 +107,8 @@ export const Login = () => {
         }}
       />
 
-      {/* Hexagonal Background Pattern - Same as Hero */}
-      <div className="absolute inset-0 opacity-[0.015]">
+      {/* Hexagonal Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.015] z-0">
         <svg
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +142,7 @@ export const Login = () => {
         </svg>
       </div>
 
-      {/* Animated hexagonal elements */}
+      {/* Animated Hexagonal Elements */}
       <motion.div
         animate={{
           rotate: [0, 360],
@@ -199,13 +193,13 @@ export const Login = () => {
         </svg>
       </motion.div>
 
-      {/* Subtle gradient overlay */}
+      {/* Subtle Gradient Overlay */}
       <motion.div 
         style={{ y, opacity }}
         className="absolute inset-0 bg-gradient-to-b from-gray-900/10 via-transparent to-transparent"
       />
-      
-      {/* Minimal floating elements with hexagonal inspiration */}
+
+      {/* Floating Gradient Elements */}
       <motion.div
         animate={{
           scale: [1, 1.05, 1],
@@ -235,17 +229,17 @@ export const Login = () => {
         }}
         className="absolute w-[500px] h-[500px] -bottom-80 -left-80"
       >
-        <div className="w-full h-full bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-3xl transform -rotate-45" />
+        <div className="w-full h-full bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl transform -rotate-45" />
       </motion.div>
 
-      <div className="container mx-auto px-6 relative z-10 max-w-md">
+      <div className="container mx-auto px-6 relative z-10 max-w-md md:max-w-3xl">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
+          className="relative p-8 md:p-12 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
         >
-          {/* Subtle hexagonal pattern overlay - same as hero */}
+          {/* Subtle Hexagonal Pattern Overlay */}
           <div className="absolute inset-0 opacity-[0.015] hover:opacity-[0.03] transition-opacity duration-500">
             <svg
               className="absolute inset-0 w-full h-full"
@@ -269,21 +263,18 @@ export const Login = () => {
 
           <div className="relative z-10">
             {/* Header */}
-            <motion.div variants={itemVariants} className="text-center mb-8">
-              {/* Minimal badge with hexagonal accent */}
+            <motion.div variants={itemVariants} className="text-center mb-10 md:mb-12">
               <motion.div
                 variants={itemVariants}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-6 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-6 backdrop-blur-sm"
               >
-                <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse-slow" />
+                <LogIn className="w-4 h-4 text-blue-400" />
                 Welcome Back
               </motion.div>
 
-              <h1 className="text-3xl md:text-4xl font-light text-white mb-4 tracking-tight">
-                Sign in to
-              </h1>
-              <h1 className="text-3xl md:text-4xl font-light text-white mb-4 tracking-tight">
-                <span className="relative">
+              <h1 className="text-4xl md:text-5xl font-light text-white mb-4 tracking-tight leading-tight">
+                Sign In to
+                <span className="relative ml-2">
                   <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
                     BrainBolt
                   </span>
@@ -302,7 +293,7 @@ export const Login = () => {
                 </span>
               </h1>
               
-              <p className="text-white/50 text-sm font-light mb-2">
+              <p className="text-white/60 text-base md:text-lg font-light">
                 Don't have an account?{' '}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -328,9 +319,13 @@ export const Login = () => {
             )}
 
             {/* Form */}
-            <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
+            <motion.form 
+              variants={itemVariants} 
+              onSubmit={handleSubmit} 
+              className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0"
+            >
               {/* Username Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="username" className="block text-sm font-light text-white/70 mb-2">
                   Username
                 </label>
@@ -342,13 +337,13 @@ export const Login = () => {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
                   placeholder="Enter your username"
                 />
               </motion.div>
 
               {/* Password Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="password" className="block text-sm font-light text-white/70 mb-2">
                   Password
                 </label>
@@ -361,7 +356,7 @@ export const Login = () => {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 pr-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
+                    className="w-full px-4 py-3 pr-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
                     placeholder="Enter your password"
                   />
                   <button
@@ -375,7 +370,7 @@ export const Login = () => {
               </motion.div>
 
               {/* Remember Me & Forgot Password */}
-              <motion.div variants={itemVariants} className="flex items-center justify-between">
+              <motion.div variants={itemVariants} className="col-span-2 flex items-center justify-between">
                 <div className="flex items-center">
                   <input
                     id="remember-me"
@@ -383,7 +378,7 @@ export const Login = () => {
                     type="checkbox"
                     className="h-4 w-4 text-blue-400 focus:ring-blue-400/50 border-white/20 rounded bg-white/[0.02] backdrop-blur-sm"
                   />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-white/50 font-light">
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-white/60 font-light">
                     Remember me
                   </label>
                 </div>
@@ -398,13 +393,13 @@ export const Login = () => {
               </motion.div>
 
               {/* Submit Button */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-2">
                 <motion.button
                   type="submit"
                   disabled={isLoading}
                   whileHover={isLoading ? {} : { scale: 1.02 }}
                   whileTap={isLoading ? {} : { scale: 0.98 }}
-                  className={`group relative w-full flex justify-center items-center gap-2 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
+                  className={`group relative w-full flex justify-center items-center gap-2 py-3 px-6 rounded-full text-base font-medium transition-all duration-300 ${
                     isLoading 
                       ? "bg-white/10 text-white/50 cursor-not-allowed" 
                       : "bg-white text-black hover:bg-white/90 hover:shadow-2xl hover:shadow-white/20"
@@ -420,7 +415,7 @@ export const Login = () => {
                     </>
                   ) : (
                     <>
-                      Sign in
+                      Sign In
                       <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
                     </>
                   )}
@@ -429,7 +424,7 @@ export const Login = () => {
             </motion.form>
           </div>
 
-          {/* Subtle glow effect on hover */}
+          {/* Subtle Glow Effect on Hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-blue-400/5 via-purple-400/5 to-pink-400/5 opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl"
             initial={{ opacity: 0 }}
