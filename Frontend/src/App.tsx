@@ -11,7 +11,8 @@ import { Signup } from './components/Auth/Signup';
 import { Login } from './components/Auth/Login';
 import { Dashboard } from './components/Dashboard/Dashboard';
 import { TheoryContent } from './components/Content/TheoryContent';
-import { Layout } from 'lucide-react';
+// import { Layout } from 'lucide-react';
+import {Layout } from './components/Linear/Test/Layout'
 
 const App: React.FC = () => {
   return (
