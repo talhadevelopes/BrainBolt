@@ -65,7 +65,17 @@ export const Hero = () => {
       className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
     >
       {/* Hexagonal Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.015]">
+      <motion.div
+        animate={{
+          opacity: [0.04, 0.06, 0.04],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute inset-0 opacity-[0.05] z-0"
+      >
         <svg
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -73,6 +83,11 @@ export const Hero = () => {
           preserveAspectRatio="xMidYMid slice"
         >
           <defs>
+            <linearGradient id="hex-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} /> {/* purple-400 */}
+              <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} /> {/* blue-400 */}
+              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} /> {/* white */}
+            </linearGradient>
             <pattern
               id="hexagons"
               x="0"
@@ -84,45 +99,53 @@ export const Hero = () => {
               <polygon
                 points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
                 fill="none"
-                stroke="white"
-                strokeWidth="0.5"
+                stroke="url(#hex-gradient)"
+                strokeWidth="0.6"
               />
               <polygon
                 points="20,9.5 28.66,14.5 28.66,24.5 20,29.5 11.34,24.5 11.34,14.5"
                 fill="none"
-                stroke="white"
-                strokeWidth="0.5"
+                stroke="url(#hex-gradient)"
+                strokeWidth="0.4"
               />
             </pattern>
+            <filter id="hex-glow">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1" />
+              <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
-          <rect width="100%" height="100%" fill="url(#hexagons)" />
+          <rect width="100%" height="100%" fill="url(#hexagons)" filter="url(#hex-glow)" />
         </svg>
-      </div>
+      </motion.div>
 
       {/* Animated hexagonal elements */}
       <motion.div
         animate={{
           rotate: [0, 360],
           scale: [1, 1.1, 1],
+          opacity: [0.02, 0.03, 0.02],
         }}
         transition={{
           duration: 20,
           repeat: Infinity,
           ease: "linear"
         }}
-        className="absolute top-20 right-20 opacity-[0.03]"
+        className="absolute top-20 right-20 opacity-[0.02]"
       >
         <svg width="120" height="120" viewBox="0 0 120 120">
           <polygon
             points="60,10 95,32.5 95,77.5 60,100 25,77.5 25,32.5"
             fill="none"
-            stroke="white"
+            stroke="url(#hex-gradient)"
             strokeWidth="1"
           />
           <polygon
             points="60,25 80,37.5 80,62.5 60,75 40,62.5 40,37.5"
             fill="none"
-            stroke="white"
+            stroke="url(#hex-gradient)"
             strokeWidth="0.5"
           />
         </svg>
@@ -132,19 +155,20 @@ export const Hero = () => {
         animate={{
           rotate: [360, 0],
           scale: [1.1, 1, 1.1],
+          opacity: [0.015, 0.025, 0.015],
         }}
         transition={{
           duration: 25,
           repeat: Infinity,
           ease: "linear"
         }}
-        className="absolute bottom-32 left-16 opacity-[0.02]"
+        className="absolute bottom-32 left-16 opacity-[0.015]"
       >
         <svg width="80" height="80" viewBox="0 0 80 80">
           <polygon
             points="40,5 65,22.5 65,57.5 40,75 15,57.5 15,22.5"
             fill="none"
-            stroke="white"
+            stroke="url(#hex-gradient)"
             strokeWidth="0.8"
           />
         </svg>
@@ -307,20 +331,43 @@ export const Hero = () => {
                 className="group relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
               >
                 {/* Subtle hexagonal pattern overlay */}
-                <div className="absolute inset-0 opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-500">
+                <motion.div
+                  animate={{
+                    opacity: [0.03, 0.05, 0.03],
+                  }}
+                  transition={{
+                    duration: 6,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity duration-500"
+                >
                   <svg
                     className="absolute inset-0 w-full h-full"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 60 60"
                   >
+                    <defs>
+                      <linearGradient id="hex-gradient-card" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style={{ stopColor: '#A78BFA', stopOpacity: 0.3 }} /> {/* purple-400 */}
+                        <stop offset="50%" style={{ stopColor: '#3B82F6', stopOpacity: 0.3 }} /> {/* blue-400 */}
+                        <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} /> {/* white */}
+                      </linearGradient>
+                    </defs>
                     <polygon
                       points="30,5 50,17.5 50,42.5 30,55 10,42.5 10,17.5"
                       fill="none"
-                      stroke="white"
+                      stroke="url(#hex-gradient-card)"
+                      strokeWidth="0.4"
+                    />
+                    <polygon
+                      points="30,15 40,22.5 40,37.5 30,45 20,37.5 20,22.5"
+                      fill="none"
+                      stroke="url(#hex-gradient-card)"
                       strokeWidth="0.3"
                     />
                   </svg>
-                </div>
+                </motion.div>
                 
                 <div className="relative z-10">
                   <div className="text-white/60 mb-4 group-hover:text-white/80 transition-colors duration-300">
