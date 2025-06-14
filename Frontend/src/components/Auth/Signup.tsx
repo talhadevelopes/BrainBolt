@@ -60,7 +60,6 @@ export const Signup = () => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
-    // Check password strength when password field changes
     if (name === 'password') {
       const strength = calculatePasswordStrength(value);
       setPasswordStrength(strength);
@@ -69,12 +68,10 @@ export const Signup = () => {
 
   const calculatePasswordStrength = (password: string): number => {
     let strength = 0;
-
     if (password.length >= 8) strength += 1;
     if (/[A-Z]/.test(password)) strength += 1;
     if (/[0-9]/.test(password)) strength += 1;
     if (/[^A-Za-z0-9]/.test(password)) strength += 1;
-
     return strength;
   };
 
@@ -106,7 +103,6 @@ export const Signup = () => {
     e.preventDefault();
     setError('');
 
-    // Basic validation
     if (!formData.name || !formData.email || !formData.password || !formData.confirmPassword) {
       setError('Please fill in all fields');
       return;
@@ -131,12 +127,8 @@ export const Signup = () => {
         password: formData.password
       });
 
-      // Check for 200 status code as successful response
       if (response.status === 200) {
-        // Show success message
         toast.success('Account created successfully!');
-
-        // Redirect to login after a short delay
         setTimeout(() => {
           navigate(redirectAfterSignup);
         }, 1500);
@@ -176,8 +168,8 @@ export const Signup = () => {
         }}
       />
 
-      {/* Hexagonal Background Pattern - Same as Hero */}
-      <div className="absolute inset-0 opacity-[0.015]">
+      {/* Hexagonal Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.015] z-0">
         <svg
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -211,28 +203,28 @@ export const Signup = () => {
         </svg>
       </div>
 
-      {/* Animated hexagonal elements */}
+      {/* Animated Hexagonal Elements */}
       <motion.div
         animate={{
           rotate: [0, 360],
           scale: [1, 1.1, 1],
         }}
         transition={{
-          duration: 22,
+          duration: 20,
           repeat: Infinity,
           ease: "linear"
         }}
         className="absolute top-20 right-20 opacity-[0.03]"
       >
-        <svg width="100" height="100" viewBox="0 0 100 100">
+        <svg width="120" height="120" viewBox="0 0 120 120">
           <polygon
-            points="50,8 80,26 80,62 50,80 20,62 20,26"
+            points="60,10 95,32.5 95,77.5 60,100 25,77.5 25,32.5"
             fill="none"
             stroke="white"
             strokeWidth="1"
           />
           <polygon
-            points="50,20 70,32 70,56 50,68 30,56 30,32"
+            points="60,25 80,37.5 80,62.5 60,75 40,62.5 40,37.5"
             fill="none"
             stroke="white"
             strokeWidth="0.5"
@@ -246,15 +238,15 @@ export const Signup = () => {
           scale: [1.1, 1, 1.1],
         }}
         transition={{
-          duration: 28,
+          duration: 25,
           repeat: Infinity,
           ease: "linear"
         }}
         className="absolute bottom-32 left-16 opacity-[0.02]"
       >
-        <svg width="120" height="120" viewBox="0 0 120 120">
+        <svg width="80" height="80" viewBox="0 0 80 80">
           <polygon
-            points="60,10 95,32.5 95,77.5 60,100 25,77.5 25,32.5"
+            points="40,5 65,22.5 65,57.5 40,75 15,57.5 15,22.5"
             fill="none"
             stroke="white"
             strokeWidth="0.8"
@@ -262,53 +254,53 @@ export const Signup = () => {
         </svg>
       </motion.div>
 
-      {/* Subtle gradient overlay */}
+      {/* Subtle Gradient Overlay */}
       <motion.div 
         style={{ y, opacity }}
         className="absolute inset-0 bg-gradient-to-b from-gray-900/10 via-transparent to-transparent"
       />
-      
-      {/* Minimal floating elements with hexagonal inspiration */}
+
+      {/* Floating Gradient Elements */}
       <motion.div
         animate={{
           scale: [1, 1.05, 1],
           opacity: [0.02, 0.04, 0.02],
-          rotate: [0, 45, 0],
+          rotate: [0, 60, 0],
         }}
         transition={{
-          duration: 14,
+          duration: 12,
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute w-[500px] h-[500px] -top-60 -right-60"
+        className="absolute w-[600px] h-[600px] -top-80 -right-80"
       >
-        <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full blur-3xl transform rotate-12" />
+        <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full blur-3xl transform rotate-45" />
       </motion.div>
 
       <motion.div
         animate={{
           scale: [1.05, 1, 1.05],
           opacity: [0.015, 0.03, 0.015],
-          rotate: [0, -45, 0],
+          rotate: [0, -60, 0],
         }}
         transition={{
-          duration: 18,
+          duration: 15,
           repeat: Infinity,
           ease: "easeInOut"
         }}
-        className="absolute w-[600px] h-[600px] -bottom-60 -left-60"
+        className="absolute w-[500px] h-[500px] -bottom-80 -left-80"
       >
-        <div className="w-full h-full bg-gradient-to-tr from-blue-500/8 to-transparent rounded-full blur-3xl transform -rotate-12" />
+        <div className="w-full h-full bg-gradient-to-tr from-blue-500/10 to-transparent rounded-full blur-3xl transform -rotate-45" />
       </motion.div>
 
-      <div className="container mx-auto px-6 relative z-10 max-w-md">
+      <div className="container mx-auto px-6 relative z-10 max-w-md md:max-w-3xl">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
+          className="relative p-8 md:p-12 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
         >
-          {/* Subtle hexagonal pattern overlay - same as hero */}
+          {/* Subtle Hexagonal Pattern Overlay */}
           <div className="absolute inset-0 opacity-[0.015] hover:opacity-[0.03] transition-opacity duration-500">
             <svg
               className="absolute inset-0 w-full h-full"
@@ -332,23 +324,20 @@ export const Signup = () => {
 
           <div className="relative z-10">
             {/* Header */}
-            <motion.div variants={itemVariants} className="text-center mb-8">
-              {/* Minimal badge with hexagonal accent */}
+            <motion.div variants={itemVariants} className="text-center mb-10 md:mb-12">
               <motion.div
                 variants={itemVariants}
-                className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-6 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-6 backdrop-blur-sm"
               >
-                <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-full animate-pulse-slow" />
+                <UserPlus className="w-4 h-4 text-green-400" />
                 Join BrainBolt
               </motion.div>
 
-              <h1 className="text-3xl md:text-4xl font-light text-white mb-4 tracking-tight">
-                Create your
-              </h1>
-              <h1 className="text-3xl md:text-4xl font-light text-white mb-4 tracking-tight">
-                <span className="relative">
+              <h1 className="text-4xl md:text-5xl font-light text-white mb-4 tracking-tight leading-tight">
+                Create Your
+                <span className="relative ml-2">
                   <span className="bg-gradient-to-r from-green-400 via-blue-400 to-purple-400 text-transparent bg-clip-text font-medium">
-                    account
+                    Account
                   </span>
                   <motion.div
                     animate={{
@@ -365,14 +354,14 @@ export const Signup = () => {
                 </span>
               </h1>
               
-              <p className="text-white/50 text-sm font-light mb-2">
+              <p className="text-white/60 text-base md:text-lg font-light">
                 Already have an account?{' '}
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   onClick={goToLogin}
                   className="text-blue-400 hover:text-blue-300 transition-colors duration-300 font-medium"
                 >
-                  Sign in
+                  Sign In
                 </motion.button>
               </p>
             </motion.div>
@@ -391,9 +380,13 @@ export const Signup = () => {
             )}
 
             {/* Form */}
-            <motion.form variants={itemVariants} onSubmit={handleSubmit} className="space-y-6">
+            <motion.form 
+              variants={itemVariants} 
+              onSubmit={handleSubmit} 
+              className="space-y-6 md:grid md:grid-cols-2 md:gap-6 md:space-y-0"
+            >
               {/* Name Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="name" className="block text-sm font-light text-white/70 mb-2">
                   Full Name
                 </label>
@@ -405,13 +398,13 @@ export const Signup = () => {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
                   placeholder="Enter your full name"
                 />
               </motion.div>
 
               {/* Email Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="email" className="block text-sm font-light text-white/70 mb-2">
                   Email Address
                 </label>
@@ -423,13 +416,13 @@ export const Signup = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
+                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
                   placeholder="Enter your email address"
                 />
               </motion.div>
 
               {/* Password Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="password" className="block text-sm font-light text-white/70 mb-2">
                   Password
                 </label>
@@ -442,7 +435,7 @@ export const Signup = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 pr-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
+                    className="w-full px-4 py-3 pr-12 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
                     placeholder="Create a password"
                   />
                   <button
@@ -454,9 +447,8 @@ export const Signup = () => {
                   </button>
                 </div>
 
-                {/* Password Strength Indicator */}
                 {formData.password && (
-                  <div className="mt-3 space-y-2">
+                  <div className="mt-3 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="text-xs text-white/40 font-light">Password strength:</div>
                       <div className={`text-xs font-medium ${getStrengthTextColor()}`}>
@@ -469,9 +461,7 @@ export const Signup = () => {
                         style={{ width: `${(passwordStrength / 4) * 100}%` }}
                       ></div>
                     </div>
-
-                    {/* Password Requirements */}
-                    <div className="grid grid-cols-2 gap-2 mt-3">
+                    <div className="grid grid-cols-2 gap-2">
                       {[
                         { test: /[A-Z]/.test(formData.password), label: 'Capital letter' },
                         { test: /[0-9]/.test(formData.password), label: 'Number' },
@@ -491,30 +481,41 @@ export const Signup = () => {
               </motion.div>
 
               {/* Confirm Password Field */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-1">
                 <label htmlFor="confirmPassword" className="block text-sm font-light text-white/70 mb-2">
                   Confirm Password
                 </label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light"
-                  placeholder="Confirm your password"
-                />
+                <div className="relative">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-2xl bg-white/[0.02] border border-white/[0.05] text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-blue-400/50 focus:border-transparent transition-all duration-300 backdrop-blur-sm font-light text-sm"
+                    placeholder="Confirm your password"
+                  />
+                  {formData.password && formData.confirmPassword && (
+                    <div className="absolute inset-y-0 right-0 pr-4 flex items-center">
+                      {formData.password === formData.confirmPassword ? (
+                        <Check className="h-5 w-5 text-green-400" />
+                      ) : (
+                        <AlertCircle className="h-5 w-5 text-red-400" />
+                      )}
+                    </div>
+                  )}
+                </div>
                 {formData.password && formData.confirmPassword && (
-                  <div className="mt-2 flex items-center">
+                  <div className="mt-2">
                     {formData.password === formData.confirmPassword ? (
                       <span className="text-xs text-green-400 flex items-center font-light">
-                        <Check className="h-3 w-3 mr-1" /> Passwords match
+                        Passwords match
                       </span>
                     ) : (
                       <span className="text-xs text-red-400 flex items-center font-light">
-                        <AlertCircle className="h-3 w-3 mr-1" /> Passwords don't match
+                        Passwords don't match
                       </span>
                     )}
                   </div>
@@ -522,13 +523,13 @@ export const Signup = () => {
               </motion.div>
 
               {/* Submit Button */}
-              <motion.div variants={itemVariants}>
+              <motion.div variants={itemVariants} className="col-span-2">
                 <motion.button
                   type="submit"
                   disabled={isLoading}
                   whileHover={isLoading ? {} : { scale: 1.02 }}
                   whileTap={isLoading ? {} : { scale: 0.98 }}
-                  className={`group relative w-full flex justify-center items-center gap-2 py-3 px-4 rounded-2xl text-sm font-medium transition-all duration-300 ${
+                  className={`group relative w-full flex justify-center items-center gap-2 py-3 px-6 rounded-full text-base font-medium transition-all duration-300 ${
                     isLoading 
                       ? "bg-white/10 text-white/50 cursor-not-allowed" 
                       : "bg-white text-black hover:bg-white/90 hover:shadow-2xl hover:shadow-white/20"
@@ -552,7 +553,7 @@ export const Signup = () => {
               </motion.div>
 
               {/* Terms */}
-              <motion.p variants={itemVariants} className="text-xs text-center text-white/30 font-light">
+              <motion.p variants={itemVariants} className="col-span-2 text-center text-xs text-white/30 font-light mt-4">
                 By creating an account, you agree to our{' '}
                 <span className="text-white/50 hover:text-white/70 transition-colors duration-300 cursor-pointer">
                   Terms of Service
@@ -565,7 +566,7 @@ export const Signup = () => {
             </motion.form>
           </div>
 
-          {/* Subtle glow effect on hover */}
+          {/* Subtle Glow Effect on Hover */}
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-green-400/5 via-blue-400/5 to-purple-400/5 opacity-0 hover:opacity-100 transition-opacity duration-500 rounded-3xl blur-xl"
             initial={{ opacity: 0 }}
