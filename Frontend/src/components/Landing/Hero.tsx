@@ -1,159 +1,373 @@
-import { motion } from 'framer-motion';
-import { Gamepad2, Brain, Rocket } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { motion, useScroll, useTransform, Variants } from 'framer-motion';
+import { 
+  Brain, 
+  Zap, 
+  Target, 
+  TrendingUp, 
+  PlayCircle, 
+  Sparkles,
+  ArrowRight,
+  BookOpen,
+  Users,
+  Trophy,
+  ChevronDown
+} from 'lucide-react';
+import { useRef } from 'react';
 
 export const Hero = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
 
-  const Navigate = useNavigate();
-  const containerVariants = {
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+  const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
+        staggerChildren: 0.08,
+        delayChildren: 0.1
       }
     }
   };
 
-  const itemVariants = {
+  const itemVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
       transition: {
-        duration: 0.8,
-        ease: "easeOut"
+        duration: 0.6,
+        ease: [0.25, 0.1, 0.25, 1]
       }
-    }
-  };
-
-  const buttonVariants = {
-    hover: {
-      scale: 1.05,
-      transition: {
-        duration: 0.2,
-        type: "spring",
-        stiffness: 400
-      }
-    },
-    tap: {
-      scale: 0.95
     }
   };
 
   const handleGetStarted = () => {
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (isAuthenticated) {
-    Navigate('/input');
-  } else {
-    const nestedRedirect = encodeURIComponent('/login?redirect=/input');
-    Navigate(`/signup?redirect=${nestedRedirect}`);
-  }
-};
+    console.log('Get Started clicked');
+  };
 
+  const handleWatchDemo = () => {
+    console.log('Watch Demo clicked');
+  };
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden py-20">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-900 via-slate-900 to-black"></div>
-      
-      {/* Animated circles */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: [0.1, 0.2, 0.1],
-          scale: [1, 1.2, 1],
-          rotate: [0, 90, 0]
-        }}
-        transition={{ 
-          duration: 8,
-          repeat: Infinity,
-          repeatType: "reverse"
-        }}
-        className="absolute w-96 h-96 bg-purple-500 rounded-full filter blur-3xl -top-20 -left-20"
-      />
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ 
-          opacity: [0.1, 0.2, 0.1],
-          scale: [1, 1.2, 1],
-          rotate: [0, -90, 0]
-        }}
-        transition={{ 
-          duration: 8,
-          repeat: Infinity,
-          repeatType: "reverse",
-          delay: 4
-        }}
-        className="absolute w-96 h-96 bg-blue-500 rounded-full filter blur-3xl -bottom-20 -right-20"
-      />
+    <section 
+      ref={containerRef}
+      className="relative min-h-screen flex flex-col justify-center overflow-hidden bg-black"
+    >
+      {/* Hexagonal Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.015]">
+        <svg
+          className="absolute inset-0 w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <pattern
+              id="hexagons"
+              x="0"
+              y="0"
+              width="20"
+              height="17.32"
+              patternUnits="userSpaceOnUse"
+            >
+              <polygon
+                points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
+                fill="none"
+                stroke="white"
+                strokeWidth="0.5"
+              />
+              <polygon
+                points="20,9.5 28.66,14.5 28.66,24.5 20,29.5 11.34,24.5 11.34,14.5"
+                fill="none"
+                stroke="white"
+                strokeWidth="0.5"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hexagons)" />
+        </svg>
+      </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      {/* Animated hexagonal elements */}
+      <motion.div
+        animate={{
+          rotate: [0, 360],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        className="absolute top-20 right-20 opacity-[0.03]"
+      >
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <polygon
+            points="60,10 95,32.5 95,77.5 60,100 25,77.5 25,32.5"
+            fill="none"
+            stroke="white"
+            strokeWidth="1"
+          />
+          <polygon
+            points="60,25 80,37.5 80,62.5 60,75 40,62.5 40,37.5"
+            fill="none"
+            stroke="white"
+            strokeWidth="0.5"
+          />
+        </svg>
+      </motion.div>
+
+      <motion.div
+        animate={{
+          rotate: [360, 0],
+          scale: [1.1, 1, 1.1],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+        className="absolute bottom-32 left-16 opacity-[0.02]"
+      >
+        <svg width="80" height="80" viewBox="0 0 80 80">
+          <polygon
+            points="40,5 65,22.5 65,57.5 40,75 15,57.5 15,22.5"
+            fill="none"
+            stroke="white"
+            strokeWidth="0.8"
+          />
+        </svg>
+      </motion.div>
+
+      {/* Subtle gradient overlay */}
+      <motion.div 
+        style={{ y, opacity }}
+        className="absolute inset-0 bg-gradient-to-b from-gray-900/10 via-transparent to-transparent"
+      />
+      
+      {/* Minimal floating elements with hexagonal inspiration */}
+      <motion.div
+        animate={{
+          scale: [1, 1.05, 1],
+          opacity: [0.02, 0.04, 0.02],
+          rotate: [0, 60, 0],
+        }}
+        transition={{
+          duration: 12,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute w-[600px] h-[600px] -top-80 -right-80"
+      >
+        <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full blur-3xl transform rotate-45" />
+      </motion.div>
+
+      <motion.div
+        animate={{
+          scale: [1.05, 1, 1.05],
+          opacity: [0.015, 0.03, 0.015],
+          rotate: [0, -60, 0],
+        }}
+        transition={{
+          duration: 15,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute w-[500px] h-[500px] -bottom-80 -left-80"
+      >
+        <div className="w-full h-full bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-3xl transform -rotate-45" />
+      </motion.div>
+
+      <div className="container mx-auto px-6 relative z-10 max-w-6xl">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           className="text-center"
         >
-          <motion.div variants={itemVariants}>
-            <h1 className="text-6xl md:text-7xl mt-10 font-bold text-white mb-8">
-              Learning Made 
-              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text"> Playful</span>
-            </h1>
-            <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-              Transform your educational journey with gamified learning experiences that make every lesson an adventure.
-            </p>
-          </motion.div>
-
+          {/* Minimal badge with hexagonal accent */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col sm:flex-row gap-6 justify-center mb-16"
+            className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-white/70 text-sm font-medium mb-8 backdrop-blur-sm"
           >
-            <motion.button
-              variants={buttonVariants}
-               onClick={handleGetStarted}
-              whileHover="hover"
-              whileTap="tap"
-              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-white font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all duration-300"
-            >
-              Get Started Free
-            </motion.button>
-            
+            <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse-slow" />
+            AI-Powered Learning
           </motion.div>
 
+          {/* Hero headline - Apple style */}
+          <motion.div variants={itemVariants} className="mb-6">
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-4 tracking-tight leading-[0.9]">
+              Learning
+            </h1>
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-light text-white mb-4 tracking-tight leading-[0.9]">
+              that
+              <span className="relative ml-4">
+                <span className="bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-transparent bg-clip-text font-medium">
+                  sticks
+                </span>
+                <motion.div
+                  animate={{
+                    scale: [1, 1.02, 1],
+                    opacity: [0.3, 0.6, 0.3],
+                  }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute -inset-2 bg-gradient-to-r from-blue-400/10 via-purple-400/10 to-pink-400/10 rounded-lg blur-xl -z-10"
+                />
+              </span>
+            </h1>
+          </motion.div>
+
+          {/* Subtitle - Apple's clean approach */}
+          <motion.p
+            variants={itemVariants}
+            className="text-xl md:text-2xl text-white/60 mb-4 max-w-3xl mx-auto font-light leading-relaxed"
+          >
+            Transform any content into engaging, personalized learning experiences
+          </motion.p>
+          
+          <motion.p
+            variants={itemVariants}
+            className="text-lg text-white/40 mb-12 max-w-2xl mx-auto font-light"
+          >
+            Powered by AI. Designed for retention.
+          </motion.p>
+
+          {/* CTA Buttons - Apple style */}
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row gap-4 justify-center mb-20"
+          >
+            <motion.button
+              onClick={handleGetStarted}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="group relative px-8 py-3 bg-white text-black rounded-full font-medium text-lg overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-white/20"
+            >
+              <span className="relative z-10 flex items-center gap-2 justify-center">
+                Get Started
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-200" />
+              </span>
+            </motion.button>
+            
+            <motion.button
+              onClick={handleWatchDemo}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="group px-8 py-3 border border-white/20 rounded-full text-white font-medium text-lg hover:border-white/40 transition-all duration-300 flex items-center gap-2 justify-center backdrop-blur-sm"
+            >
+              <PlayCircle className="w-4 h-4" />
+              Watch Demo
+            </motion.button>
+          </motion.div>
+
+          {/* Feature showcase - minimal cards with hexagonal accents */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
+            className="grid grid-cols-1 md:grid-cols-3 gap-1 max-w-5xl mx-auto mb-20"
           >
             {[
-              { icon: <Gamepad2 className="w-8 h-8 text-purple-400" />, title: "Gamified Learning", desc: "Learn through play and earn rewards" },
-              { icon: <Brain className="w-8 h-8 text-blue-400" />, title: "AI-Powered", desc: "Personalized learning paths" },
-              { icon: <Rocket className="w-8 h-8 text-pink-400" />, title: "Track Progress", desc: "Monitor your growth" }
+              { 
+                icon: <Brain className="w-6 h-6" />, 
+                title: "AI Generation", 
+                desc: "Automatically create quizzes and flashcards from any content"
+              },
+              { 
+                icon: <Target className="w-6 h-6" />, 
+                title: "Adaptive Learning", 
+                desc: "Personalized difficulty that evolves with your progress"
+              },
+              { 
+                icon: <TrendingUp className="w-6 h-6" />, 
+                title: "Gamified Progress", 
+                desc: "Earn achievements and track your learning journey"
+              }
             ].map((item, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
                 whileHover={{ 
-                  scale: 1.05,
-                  transition: { duration: 0.2 }
+                  y: -2,
+                  transition: { duration: 0.2, ease: "easeOut" }
                 }}
-                className="p-6 rounded-2xl bg-white/10 backdrop-blur-lg border border-white/20 hover:bg-white/20 transition-all duration-300 transform hover:shadow-xl hover:shadow-purple-500/20"
+                className="group relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] hover:bg-white/[0.04] hover:border-white/10 transition-all duration-500 overflow-hidden"
               >
-                <motion.div
-                  initial={{ scale: 1 }}
-                  whileHover={{ scale: 1.1 }}
-                  className="flex flex-col items-center text-center gap-4"
-                >
-                  {item.icon}
-                  <h3 className="text-xl font-semibold text-white">{item.title}</h3>
-                  <p className="text-gray-300">{item.desc}</p>
-                </motion.div>
+                {/* Subtle hexagonal pattern overlay */}
+                <div className="absolute inset-0 opacity-[0.02] group-hover:opacity-[0.04] transition-opacity duration-500">
+                  <svg
+                    className="absolute inset-0 w-full h-full"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 60 60"
+                  >
+                    <polygon
+                      points="30,5 50,17.5 50,42.5 30,55 10,42.5 10,17.5"
+                      fill="none"
+                      stroke="white"
+                      strokeWidth="0.3"
+                    />
+                  </svg>
+                </div>
+                
+                <div className="relative z-10">
+                  <div className="text-white/60 mb-4 group-hover:text-white/80 transition-colors duration-300">
+                    {item.icon}
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-2 group-hover:text-white transition-colors duration-300">
+                    {item.title}
+                  </h3>
+                  <p className="text-white/50 text-sm leading-relaxed group-hover:text-white/70 transition-colors duration-300">
+                    {item.desc}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Stats - Apple's minimal approach */}
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-16"
+          >
+            {[
+              { stat: "10K+", label: "Active Learners" },
+              { stat: "50K+", label: "Courses Created" },
+              { stat: "85%", label: "Retention Rate" },
+              { stat: "3x", label: "Faster Learning" }
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                variants={itemVariants}
+                whileHover={{ y: -1 }}
+                className="text-center group cursor-default"
+              >
+                <div className="text-2xl md:text-3xl font-light text-white mb-1 group-hover:text-white transition-colors">
+                  {item.stat}
+                </div>
+                <div className="text-sm text-white/40 font-light">{item.label}</div>
               </motion.div>
             ))}
           </motion.div>
         </motion.div>
       </div>
+
+      {/* Minimal scroll indicator */}
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white/30"
+      >
+        <ChevronDown className="w-6 h-6" />
+      </motion.div>
     </section>
   );
 };
