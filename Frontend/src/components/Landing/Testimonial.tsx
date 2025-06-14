@@ -173,6 +173,7 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
+          {/* @ts-ignore */}
           <motion.div variants={itemVariants}>
             <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
               What Our Users
