@@ -772,6 +772,7 @@ export function STEM() {
                     <button
                       onClick={handleCloseQuizArena}
                       style={{
+                        zIndex :"1",
                         position: "absolute",
                         top: "16px",
                         right: "16px",
@@ -846,6 +847,7 @@ export function STEM() {
                     <button
                       onClick={handleCloseCompetitiveArena}
                       style={{
+                        zIndex:"1",
                         position: "absolute",
                         top: "16px",
                         right: "16px",
@@ -922,6 +924,7 @@ export function STEM() {
                     <button
                       onClick={handleCloseBugHunter}
                       style={{
+                        zIndex:"1",
                         position: "absolute",
                         top: "16px",
                         right: "16px",
