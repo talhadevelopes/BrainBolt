@@ -122,6 +122,8 @@ const YouTubePlayer: React.FC = () => {
     }
   }, []);
 
+  
+
   // Initialize YouTube player
   useEffect(() => {
     if (!videoData || !videoData.id) return;
