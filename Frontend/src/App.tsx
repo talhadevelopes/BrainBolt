@@ -12,11 +12,15 @@ import { Login } from "./components/Auth/Login";
 import { Dashboard } from "./components/Dashboard/Dashboard";
 import { TheoryContent } from "./components/Content/TheoryContent";
 // import { Layout } from 'lucide-react';
+
 import { Layout } from "./components/Linear/Test/Layout";
 import { Pcm } from "./components/PCM";
 import { STEM } from "./components/STEM";
 import { QuizArena } from "./components/CP/QuizArena";
 import { BugHunter } from "./components/CP/BugHunterArena";
+
+// import { Stem } from './components/STEM';
+
 
 const App: React.FC = () => {
   return (
@@ -36,7 +40,9 @@ const App: React.FC = () => {
           <Route path="/rh" element={<MainResources />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/pcm" element={<Pcm />} />
+
           <Route path="/stem" element={<STEM />} />
+
           <Route path="/Test" element={<Layout />} />
         </Routes>
         <ToastContainer position="top-right" autoClose={3000} />
