@@ -205,7 +205,7 @@ export const YouTubeLearningPortal = () => {
       timeoutId = setTimeout(() => {
         localStorage.setItem('currentVideoId', videoId);
         localStorage.setItem('selectedTrack', selectedTrack);
-        const route = selectedTrack === 'Engineering' ? '/stem' : '/pcm';
+        const route = selectedTrack === 'Engineering' ? '/stem' : '/Test';
         navigate(route, { state: { videoId, track: selectedTrack } });
       }, 3000);
     }
