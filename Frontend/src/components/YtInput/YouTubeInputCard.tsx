@@ -14,7 +14,7 @@ import {
   AlertCircle,
   Info,
 } from 'lucide-react';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -71,7 +71,7 @@ const trackOptions = [
     subjects: ['Information Technology', 'CSE', 'EEE', 'ECE'],
   },
 ];
-
+//@ts-ignore
 const customToastStyle = {
   background: 'rgba(20, 20, 20, 0.9)',
   color: '#fff',
