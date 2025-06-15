@@ -34,7 +34,7 @@ interface BugHunterProps {
 
 export const BugHunter: React.FC<BugHunterProps> = ({ initialVideoId }) => {
   const [hasError, setHasError] = useState(false)
-  const [activeTab, setActiveTab] = useState<"instructions" | "hints" | "tracker">("instructions")
+  const [] = useState<"instructions" | "hints" | "tracker">("instructions")
   const {
     challenge,
     userCode,
