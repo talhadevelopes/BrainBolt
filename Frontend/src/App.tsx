@@ -15,6 +15,7 @@ import { TheoryContent } from "./components/Content/TheoryContent";
 import { Layout } from "./components/Linear/Test/Layout";
 // import { Pcm } from "./components/PCM";
 import { STEM } from "./components/STEM";
+
 import { QuizArena } from "./components/CP/QuizArena";
 import { BugHunter } from "./components/CP/BugHunterArena";
 

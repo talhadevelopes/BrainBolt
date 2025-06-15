@@ -16,7 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useQuizStore } from "../../stores/quizStore";
 
 interface QuizArenaProps {
-  initialVideoId?: string; // New prop for pre-filling videoId
+  initialVideoId?: string;
 }
 
 export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
@@ -48,7 +48,6 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
     [key: string]: boolean;
   }>({});
 
-  // Initialize videoId from prop and reset on mount
   useEffect(() => {
     reset();
     if (initialVideoId && initialVideoId.trim()) {
@@ -85,7 +84,6 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
     startQuestion();
     answerQuestion(difficulty, questionIndex, answerIndex);
 
-    // Show explanation after answering
     setTimeout(() => {
       setShowExplanation((prev) => ({ ...prev, [key]: true }));
     }, 500);
@@ -111,13 +109,13 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "text-green-400 bg-green-900/20 border-green-800/30";
+        return "text-green-400 bg-green-500/20 border-green-500/30";
       case "medium":
-        return "text-yellow-400 bg-yellow-900/20 border-yellow-800/30";
+        return "text-yellow-400 bg-yellow-500/20 border-yellow-500/30";
       case "hard":
-        return "text-red-400 bg-red-900/20 border-red-800/30";
+        return "text-red-400 bg-red-500/20 border-red-500/30";
       default:
-        return "text-gray-400 bg-gray-900/20 border-gray-800/30";
+        return "text-white/60 bg-white/10 border-white/20";
     }
   };
 
@@ -136,11 +134,11 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
     if (!question) {
       return (
         <div className="text-center py-12">
-          <Brain className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-400 text-lg">
+          <Brain className="h-16 w-16 mx-auto text-white/40 mb-4" />
+          <p className="text-white/60 text-lg">
             No questions available for {difficulty} difficulty
           </p>
-          <p className="text-gray-500 text-sm mt-2">
+          <p className="text-white/40 text-sm mt-2">
             Generate quizzes from a YouTube video to get started
           </p>
         </div>
@@ -163,7 +161,7 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
         {/* Question Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-sm font-medium text-gray-400">
+            <span className="text-sm font-medium text-white/60">
               Question {currentIndex + 1} of {questions[difficulty].length}
             </span>
             <span
@@ -176,15 +174,15 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           </div>
 
           {question.topic && (
-            <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">
+            <span className="text-xs text-white/40 bg-white/5 px-2 py-1 rounded">
               {question.topic}
             </span>
           )}
         </div>
 
         {/* Question */}
-        <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-          <h3 className="text-xl font-semibold text-white mb-6">
+        <div className="p-6 bg-white/[0.02] border border-white/[0.05] rounded-3xl">
+          <h3 className="text-xl font-medium text-white mb-6">
             {question.question}
           </h3>
 
@@ -196,24 +194,24 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
               const showResult = isAnswered && showExp;
 
               let optionClass =
-                "p-4 border rounded-lg cursor-pointer transition-all duration-200 ";
+                "p-4 border rounded-2xl cursor-pointer transition-all duration-200 ";
 
               if (showResult) {
                 if (isCorrect) {
                   optionClass +=
-                    "bg-green-900/20 border-green-800/30 text-green-300";
+                    "bg-green-500/20 border-green-500/30 text-green-300";
                 } else if (isSelected && !isCorrect) {
-                  optionClass += "bg-red-900/20 border-red-800/30 text-red-300";
+                  optionClass += "bg-red-500/20 border-red-500/30 text-red-300";
                 } else {
                   optionClass +=
-                    "bg-slate-800/30 border-slate-700 text-gray-400";
+                    "bg-white/5 border-white/10 text-white/60";
                 }
               } else if (isSelected) {
                 optionClass +=
-                  "bg-indigo-900/30 border-indigo-700 text-indigo-300";
+                  "bg-purple-500/20 border-purple-500/30 text-purple-300";
               } else {
                 optionClass +=
-                  "bg-slate-800/30 border-slate-700 text-gray-300 hover:bg-slate-700/50 hover:border-slate-600";
+                  "bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:border-white/20";
               }
 
               return (
@@ -260,10 +258,10 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              className="p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg"
+              className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl"
             >
               <div className="flex items-start gap-3">
-                <div className="p-1 bg-blue-900/40 rounded">
+                <div className="p-1 bg-blue-500/20 rounded">
                   <Brain className="h-4 w-4 text-blue-400" />
                 </div>
                 <div>
@@ -284,12 +282,12 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <button
             onClick={() => handlePrevQuestion(difficulty)}
             disabled={currentIndex === 0}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
           >
             Previous
           </button>
 
-          <div className="text-sm text-gray-400">
+          <div className="text-sm text-white/60">
             {isAnswered ? (
               <span
                 className={
@@ -306,7 +304,7 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <button
             onClick={() => handleNextQuestion(difficulty)}
             disabled={currentIndex === questions[difficulty].length - 1}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 disabled:bg-slate-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
           >
             Next
           </button>
@@ -316,8 +314,52 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
   };
 
   return (
-    <section className="relative py-12 overflow-hidden bg-slate-900">
-      <div className="container mx-auto px-6">
+    <div className="min-h-screen bg-black text-white relative overflow-hidden">
+      {/* Background Pattern */}
+      <motion.div
+        animate={{
+          opacity: [0.04, 0.06, 0.04],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: 'easeInOut',
+        }}
+        className="absolute inset-0 opacity-[0.05] z-0"
+      >
+        <svg
+          className="absolute inset-0 w-full h-full"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="xMidYMid slice"
+        >
+          <defs>
+            <linearGradient id="hex-gradient-quiz" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style={{ stopColor: '#A855F7', stopOpacity: 0.3 }} />
+              <stop offset="50%" style={{ stopColor: '#EC4899', stopOpacity: 0.3 }} />
+              <stop offset="100%" style={{ stopColor: '#FFFFFF', stopOpacity: 0.3 }} />
+            </linearGradient>
+            <pattern
+              id="hexagons-quiz"
+              x="0"
+              y="0"
+              width="20"
+              height="17.32"
+              patternUnits="userSpaceOnUse"
+            >
+              <polygon
+                points="10,1 18.66,6 18.66,16 10,21 1.34,16 1.34,6"
+                fill="none"
+                stroke="url(#hex-gradient-quiz)"
+                strokeWidth="0.6"
+              />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#hexagons-quiz)" />
+        </svg>
+      </motion.div>
+
+      <div className="container mx-auto px-6 py-12 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -325,17 +367,17 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           transition={{ duration: 0.8 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 flex items-center justify-center gap-4">
+          <h2 className="text-4xl md:text-5xl font-light text-white mb-6 flex items-center justify-center gap-4">
             <Brain className="h-12 w-12 text-purple-400" />
             <span>
               Quiz
-              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
+              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text font-medium">
                 {" "}
                 Arena
               </span>
             </span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
             Test your knowledge with AI-generated quizzes from YouTube videos
           </p>
         </motion.div>
@@ -345,18 +387,18 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-8 p-6 bg-white/10 rounded-2xl backdrop-blur-lg border border-white/20"
+          className="mb-8 p-6 bg-white/[0.02] rounded-3xl backdrop-blur-sm border border-white/[0.05]"
         >
           <div className="flex items-center gap-3 mb-4">
             <Youtube className="h-6 w-6 text-red-400" />
-            <h3 className="text-xl font-semibold text-white">
+            <h3 className="text-xl font-medium text-white">
               Generate Quizzes from YouTube Video
             </h3>
           </div>
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-white/60 mb-2">
                 YouTube Video ID
               </label>
               <input
@@ -365,9 +407,9 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
                 onChange={handleVideoIdChange}
                 onKeyPress={handleKeyPress}
                 placeholder="Enter YouTube video ID (e.g., dQw4w9WgXcQ)"
-                className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/40 focus:outline-none focus:border-white/20 transition-all"
               />
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-white/40 mt-1">
                 This will generate 5 questions each for Easy, Medium, and Hard
                 difficulty
               </p>
@@ -377,9 +419,9 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
               <motion.button
                 onClick={handleGenerateQuizzes}
                 disabled={loading || !videoId.trim()}
-                className={`px-8 py-3 rounded-lg font-semibold flex items-center gap-3 transition-all duration-300 ${
+                className={`px-8 py-3 rounded-2xl font-medium flex items-center gap-3 transition-all duration-300 ${
                   loading || !videoId.trim()
-                    ? "bg-slate-700/50 cursor-not-allowed text-gray-400"
+                    ? "bg-white/10 cursor-not-allowed text-white/40"
                     : "bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl"
                 }`}
                 whileHover={!loading && videoId.trim() ? { scale: 1.02 } : {}}
@@ -406,7 +448,7 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg"
+            className="mb-6 p-4 bg-blue-500/10 border border-blue-500/20 rounded-2xl"
           >
             <h3 className="text-blue-300 font-medium mb-2">
               📝 Transcript Preview
@@ -425,7 +467,7 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-6 bg-red-900/20 border border-red-800/30 rounded-2xl"
+            className="mb-6 p-6 bg-red-500/10 border border-red-500/20 rounded-2xl"
           >
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 bg-red-400 rounded-full"></div>
@@ -440,11 +482,11 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 animate-pulse space-y-4 p-8 bg-white/10 rounded-2xl"
+            className="mb-8 animate-pulse space-y-4 p-8 bg-white/[0.02] rounded-3xl"
           >
-            <div className="h-8 bg-slate-700 rounded w-3/4 mx-auto"></div>
-            <div className="h-4 bg-slate-700 rounded w-full"></div>
-            <div className="h-4 bg-slate-700 rounded w-5/6"></div>
+            <div className="h-8 bg-white/10 rounded w-3/4 mx-auto"></div>
+            <div className="h-4 bg-white/10 rounded w-full"></div>
+            <div className="h-4 bg-white/10 rounded w-5/6"></div>
             <div className="flex items-center justify-center py-8">
               <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
             </div>
@@ -456,16 +498,16 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 p-6 bg-gradient-to-r from-indigo-900/20 to-purple-900/20 border border-indigo-800/30 rounded-2xl"
+            className="mb-8 p-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-3xl"
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+              <h3 className="text-xl font-medium text-white flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-yellow-400" />
                 Quiz Statistics
               </h3>
               <button
                 onClick={resetQuiz}
-                className="px-3 py-1 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm flex items-center gap-2 transition-colors"
+                className="px-3 py-1 bg-white/10 hover:bg-white/20 text-white rounded-xl text-sm flex items-center gap-2 transition-colors"
               >
                 <RotateCcw className="h-4 w-4" />
                 Reset
@@ -473,44 +515,44 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+              <div className="p-3 bg-white/5 rounded-xl text-center">
                 <div className="text-2xl font-bold text-white">
                   {stats.answeredQuestions}
                 </div>
-                <div className="text-xs text-gray-400">Answered</div>
+                <div className="text-xs text-white/60">Answered</div>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+              <div className="p-3 bg-white/5 rounded-xl text-center">
                 <div className="text-2xl font-bold text-green-400">
                   {stats.correctAnswers}
                 </div>
-                <div className="text-xs text-gray-400">Correct</div>
+                <div className="text-xs text-white/60">Correct</div>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+              <div className="p-3 bg-white/5 rounded-xl text-center">
                 <div className="text-2xl font-bold text-blue-400">
                   {stats.accuracy.toFixed(1)}%
                 </div>
-                <div className="text-xs text-gray-400">Accuracy</div>
+                <div className="text-xs text-white/60">Accuracy</div>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+              <div className="p-3 bg-white/5 rounded-xl text-center">
                 <div className="text-2xl font-bold text-purple-400">
                   {stats.averageTime.toFixed(1)}s
                 </div>
-                <div className="text-xs text-gray-400">Avg Time</div>
+                <div className="text-xs text-white/60">Avg Time</div>
               </div>
-              <div className="p-3 bg-slate-800/50 rounded-lg text-center">
+              <div className="p-3 bg-white/5 rounded-xl text-center">
                 <div className="text-2xl font-bold text-yellow-400">
                   {stats.totalQuestions}
                 </div>
-                <div className="text-xs text-gray-400">Total</div>
+                <div className="text-xs text-white/60">Total</div>
               </div>
             </div>
           </motion.div>
         )}
 
         {/* Quiz Tabs */}
-        <div className="bg-slate-800/50 rounded-2xl border border-slate-700 overflow-hidden">
+        <div className="bg-white/[0.02] rounded-3xl border border-white/[0.05] overflow-hidden">
           {/* Tab Navigation */}
-          <div className="border-b border-slate-700 bg-slate-800/70">
+          <div className="border-b border-white/10 bg-white/5">
             <div className="flex">
               {(["easy", "medium", "hard"] as const).map((difficulty) => (
                 <button
@@ -518,10 +560,8 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
                   onClick={() => setCurrentTab(difficulty)}
                   className={`flex-1 px-6 py-4 text-sm font-medium transition-all duration-200 ${
                     currentTab === difficulty
-                      ? getDifficultyColor(difficulty)
-                          .replace("bg-", "bg-")
-                          .replace("/20", "/30") + " border-b-2 border-current"
-                      : "text-gray-400 hover:text-gray-300 hover:bg-slate-700/50"
+                      ? getDifficultyColor(difficulty) + " border-b-2 border-current"
+                      : "text-white/60 hover:text-white/80 hover:bg-white/5"
                   }`}
                 >
                   <div className="flex items-center justify-center gap-2">
@@ -545,6 +585,6 @@ export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

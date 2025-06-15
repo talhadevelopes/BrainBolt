@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import { 
   Play, 
@@ -15,9 +15,18 @@ import {
   BookOpen,
   Loader,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Brain,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+
+// Extend the Window interface to include onYouTubeIframeAPIReady
+declare global {
+  interface Window {
+    onYouTubeIframeAPIReady?: () => void;
+    YT?: any;
+  }
+}
 
 interface Timestamp {
   time: number;
@@ -32,17 +41,11 @@ interface VideoData {
   timestamps: Timestamp[];
 }
 
-interface PCMTrack {
-  id: string;
-  title: string;
-  duration: string;
-  bpm: number;
-  key: string;
-  mood: string;
-  tags: string[];
-}
-
 interface YouTubePlayerProps {
+  videoId?: string;
+  onReady?: (videoData: VideoData) => void;
+  onStateChange?: (state: number) => void;
+  onTimeUpdate?: (currentTime: number, duration: number) => void;
   timestamps?: number[];
   onTimestampReached?: (timestamp: number) => void;
 }
@@ -83,12 +86,22 @@ const itemVariants: Variants = {
   },
 };
 
+const modalVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3 } },
+  exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } },
+};
+
 const YouTubePlayer: React.FC<YouTubePlayerProps> = ({ 
+  videoId: propVideoId,
   timestamps = [], 
-  onTimestampReached 
+  onTimestampReached,
+  onReady,
+  onStateChange,
+  onTimeUpdate
 }) => {
+  const stableTimestamps = useMemo(() => timestamps, [timestamps]);
   const [videoData, setVideoData] = useState<VideoData | null>(null);
-  const [pcmTracks, setPcmTracks] = useState<PCMTrack[]>([]);
   const [player, setPlayer] = useState<YouTubePlayerInstance | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -96,84 +109,55 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   const [volume, setVolume] = useState(80);
   const [isMuted, setIsMuted] = useState(false);
   const [activeChapter, setActiveChapter] = useState(0);
-  const [backgroundTrack, setBackgroundTrack] = useState<PCMTrack | null>(null);
-  const [bgAudioPlaying, setBgAudioPlaying] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const [] = useState('auto');
+  const [isYouTubeApiLoaded, setIsYouTubeApiLoaded] = useState(false);
+  const [showTestModules, setShowTestModules] = useState(false);
   
   const playerRef = useRef<YouTubePlayerInstance | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const apiLoadTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize data
   useEffect(() => {
+    const defaultVideoId = "M7lc1UVf-VE"; // Known embeddable video
+    const selectedVideoId = propVideoId || localStorage.getItem("currentVideoId") || defaultVideoId;
+
+    // Validate videoId format
+    if (!/^[0-9A-Za-z_-]{10}[0-9A-Za-z_-]$/.test(selectedVideoId)) {
+      console.error(`Invalid video ID format: ${selectedVideoId}`);
+      setError('Invalid video ID format');
+      setLoading(false);
+      toast.error(
+        <motion.div
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="flex items-center gap-3"
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-sm font-light">Invalid video ID</span>
+        </motion.div>,
+        { autoClose: 3000 }
+      );
+      return;
+    }
+
     try {
-      const videoId = localStorage.getItem("currentVideoId") || "dQw4w9WgXcQ";
-      
-      const videoData: VideoData = {
-        id: videoId,
+      const newVideoData: VideoData = {
+        id: selectedVideoId,
         title: 'Advanced Physics: Quantum Mechanics & Modern Applications',
         artist: 'Dr. Elena Rodriguez - Stanford Physics Department',
         duration: 300,
-        timestamps: timestamps.map((time, index) => ({
+        timestamps: stableTimestamps.map((time, index) => ({
           time,
           title: `Learning Module ${index + 1}: Concept at ${time}s`
         }))
       };
 
-      const pcmTracks: PCMTrack[] = [
-        {
-          id: 'track-1',
-          title: 'Deep Focus - Ambient Study',
-          duration: '4:32',
-          bpm: 72,
-          key: 'C Major',
-          mood: 'Focused',
-          tags: ['ambient', 'study', 'concentration', 'peaceful']
-        },
-        {
-          id: 'track-2',
-          title: 'Classical Piano - Learning Flow',
-          duration: '6:15',
-          bpm: 60,
-          key: 'D Minor',
-          mood: 'Contemplative',
-          tags: ['classical', 'piano', 'meditation', 'elegant']
-        },
-        {
-          id: 'track-3',
-          title: 'Nature Sounds - Forest Ambience',
-          duration: '8:00',
-          bpm: 0,
-          key: 'Natural',
-          mood: 'Serene',
-          tags: ['nature', 'forest', 'birds', 'organic']
-        },
-        {
-          id: 'track-4',
-          title: 'Lo-Fi Study Beats - Productivity',
-          duration: '3:45',
-          bpm: 85,
-          key: 'G Major',
-          mood: 'Energetic',
-          tags: ['lo-fi', 'beats', 'productivity', 'modern']
-        },
-        {
-          id: 'track-5',
-          title: 'White Noise - Rain & Thunder',
-          duration: '10:00',
-          bpm: 0,
-          key: 'Natural',
-          mood: 'Calming',
-          tags: ['white-noise', 'rain', 'thunder', 'sleep']
-        }
-      ];
-
-      setVideoData(videoData);
-      setPcmTracks(pcmTracks);
+      setVideoData(newVideoData);
       setLoading(false);
       
       toast.success(
@@ -187,7 +171,12 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         </motion.div>,
         { autoClose: 3000 }
       );
+
+      if (onReady) {
+        onReady(newVideoData);
+      }
     } catch (err) {
+      console.error('Failed to initialize video data:', err);
       setError('Failed to load video data');
       setLoading(false);
       
@@ -203,57 +192,122 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
         { autoClose: 3000 }
       );
     }
-  }, [timestamps]);
+  }, [stableTimestamps, propVideoId, onReady]);
 
-  // Initialize YouTube player
+  // Initialize YouTube API
   useEffect(() => {
     if (!videoData || !videoData.id) return;
 
-    const loadPlayer = () => {
-      // @ts-ignore - YouTube player API is loaded globally
-      playerRef.current = new window.YT.Player('youtube-player', {
-        height: '100%',
-        width: '100%',
-        videoId: videoData.id,
-        playerVars: {
-          playsinline: 1,
-          enablejsapi: 1,
-          origin: window.location.origin,
-          controls: 0,
-          modestbranding: 1,
-          rel: 0
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange,
-          'onError': onPlayerError
-        }
-      });
-    };
+    const loadYouTubeApi = () => {
+      if (window.YT && window.YT.Player) {
+        setIsYouTubeApiLoaded(true);
+        return;
+      }
 
-    // @ts-ignore - Checking for global YT object
-    if (!window.YT) {
+      console.log('Loading YouTube IFrame API...');
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
-      
       const firstScriptTag = document.getElementsByTagName('script')[0];
       if (firstScriptTag && firstScriptTag.parentNode) {
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
       }
 
-      // @ts-ignore - Assigning global callback
-      window.onYouTubeIframeAPIReady = loadPlayer;
-    } else {
-      loadPlayer();
-    }
+      window.onYouTubeIframeAPIReady = () => {
+        console.log('YouTube IFrame API loaded');
+        setIsYouTubeApiLoaded(true);
+        if (apiLoadTimeoutRef.current) {
+          clearTimeout(apiLoadTimeoutRef.current);
+        }
+      };
+
+      apiLoadTimeoutRef.current = setTimeout(() => {
+        console.error('YouTube API failed to load within 10 seconds');
+        setError('Failed to load YouTube API');
+        setLoading(false);
+        toast.error(
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light">Failed to load YouTube API</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
+      }, 10000);
+    };
+
+    loadYouTubeApi();
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (playerRef.current) playerRef.current.destroy();
+      if (apiLoadTimeoutRef.current) {
+        clearTimeout(apiLoadTimeoutRef.current);
+      }
+      delete window.onYouTubeIframeAPIReady;
     };
   }, [videoData]);
 
+  // Initialize player
+  useEffect(() => {
+    if (!isYouTubeApiLoaded || !videoData || !videoData.id) return;
+
+    const loadPlayer = () => {
+      try {
+        console.log(`Initializing YouTube player with video ID: ${videoData.id}`);
+        playerRef.current = new window.YT.Player('youtube-player', {
+          height: '100%',
+          width: '100%',
+          videoId: videoData.id,
+          playerVars: {
+            playsinline: 1,
+            enablejsapi: 1,
+            origin: window.location.origin,
+            controls: 0,
+            modestbranding: 1,
+            rel: 0
+          },
+          events: {
+            onReady: onPlayerReady,
+            onStateChange: onPlayerStateChange,
+            onError: onPlayerError
+          }
+        });
+      } catch (err) {
+        console.error('Error initializing YouTube player:', err);
+        setError('Failed to initialize YouTube player');
+        setLoading(false);
+        toast.error(
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light">Failed to initialize player</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
+      }
+    };
+
+    loadPlayer();
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (playerRef.current) {
+        try {
+          console.log('Destroying YouTube player');
+          playerRef.current.destroy();
+        } catch (err) {
+          console.error('Error destroying player:', err);
+        }
+      }
+    };
+  }, [isYouTubeApiLoaded, videoData]);
+
   const onPlayerReady = (event: { target: YouTubePlayerInstance }) => {
+    console.log('YouTube player ready');
     setPlayer(event.target);
     setDuration(event.target.getDuration());
     event.target.setVolume(volume);
@@ -261,21 +315,37 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   };
 
   const onPlayerStateChange = (event: { data: number }) => {
+    console.log(`Player state changed: ${event.data}`);
     if (event.data === 0) {
       setIsPlaying(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
     } else if (event.data === 1) {
       setIsPlaying(true);
       startProgressTracking();
+      if (onStateChange) onStateChange(1);
     } else if (event.data === 2) {
       setIsPlaying(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
+      if (onStateChange) onStateChange(2);
     }
   };
 
   const onPlayerError = (event: { data: number }) => {
-    console.error('YouTube Player Error:', event.data);
-    setError(`Player error: ${getYouTubeError(event.data)}`);
+    console.error(`YouTube Player Error: Code ${event.data}`);
+    const errorMessage = getYouTubeError(event.data);
+    setError(errorMessage);
+    setLoading(false);
+    toast.error(
+      <motion.div
+        initial={{ opacity: 0, x: 100 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="flex items-center gap-3"
+      >
+        <AlertCircle className="w-5 h-5 text-red-400" />
+        <span className="text-sm font-light">{errorMessage}</span>
+      </motion.div>,
+      { autoClose: 3000 }
+    );
   };
 
   const getYouTubeError = (errorCode: number): string => {
@@ -283,8 +353,8 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
       case 2: return 'Invalid video ID';
       case 5: return 'HTML5 player error';
       case 100: return 'Video not found';
-      case 101: case 150: return 'Embedding not allowed';
-      default: return `Error code: ${errorCode}`;
+      case 101: case 150: return 'Video not embeddable';
+      default: return `Player error code: ${errorCode}`;
     }
   };
 
@@ -295,15 +365,14 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
       if (player && player.getCurrentTime) {
         const time = player.getCurrentTime();
         setCurrentTime(time);
+        if (onTimeUpdate) onTimeUpdate(time, duration);
         
-        // Check for timestamp triggers
-        timestamps.forEach(timestamp => {
+        stableTimestamps.forEach(timestamp => {
           if (Math.abs(time - timestamp) < 0.5 && onTimestampReached) {
             onTimestampReached(timestamp);
           }
         });
         
-        // Update active chapter
         const chapterIndex = videoData?.timestamps.findIndex(
           (ts, index, arr) => 
             time >= ts.time && 
@@ -367,31 +436,6 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
   };
 
-  const handleTrackSelect = (track: PCMTrack) => {
-    setBackgroundTrack(track);
-    setBgAudioPlaying(true);
-    
-    toast.success(
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex items-center gap-3"
-      >
-        <Play className="w-5 h-5 text-green-400" />
-        <div>
-          <p className="text-sm font-medium">Background Track Selected</p>
-          <p className="text-xs text-gray-300">{track.title}</p>
-        </div>
-      </motion.div>,
-      { autoClose: 3000 }
-    );
-  };
-
-  const toggleBackgroundAudio = () => {
-    setBgAudioPlaying(!bgAudioPlaying);
-    toast.info(`Background audio ${bgAudioPlaying ? 'paused' : 'playing'}`);
-  };
-
   const shareVideo = () => {
     const shareData = {
       title: videoData?.title || 'Educational Video',
@@ -402,6 +446,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     if (navigator.share) {
       navigator.share(shareData).catch(err => {
         console.error('Error sharing:', err);
+        toast.error('Failed to share video');
       });
     } else {
       navigator.clipboard.writeText(shareData.url);
@@ -410,7 +455,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
   };
 
   const downloadTranscript = () => {
-    const transcript = `Transcript for: ${videoData?.title}\n\nInteractive learning timestamps:\n${timestamps.map(t => `${formatTime(t)}: Learning checkpoint`).join('\n')}`;
+    const transcript = `Transcript for: ${videoData?.title}\n\nInteractive learning timestamps:\n${stableTimestamps.map(t => `${formatTime(t)}: Learning checkpoint`).join('\n')}`;
     const blob = new Blob([transcript], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -420,6 +465,13 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
     URL.revokeObjectURL(url);
     
     toast.success('Transcript downloaded!');
+  };
+
+  const retryWithFallback = () => {
+    setError(null);
+    setLoading(true);
+    setVideoData(null);
+    localStorage.setItem("currentVideoId", "M7lc1UVf-VE");
   };
 
   if (loading) {
@@ -454,14 +506,24 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
           <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
           <h3 className="text-red-200 font-bold text-xl mb-3">Player Error</h3>
           <p className="text-red-100 mb-6 font-light">{error}</p>
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl transition font-medium"
-            onClick={() => window.location.reload()}
-          >
-            Retry Loading
-          </motion.button>
+          <div className="flex gap-4 justify-center">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl transition font-medium"
+              onClick={() => window.location.reload()}
+            >
+              Reload Page
+            </motion.button>
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl transition font-medium"
+              onClick={retryWithFallback}
+            >
+              Try Fallback Video
+            </motion.button>
+          </div>
         </div>
       </motion.div>
     );
@@ -561,7 +623,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
                     className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500"
                   />
                   {/* Timestamp markers */}
-                  {timestamps.map((timestamp, index) => (
+                  {stableTimestamps.map((timestamp, index) => (
                     <div
                       key={index}
                       className="absolute top-0 w-1 h-2 bg-yellow-400 rounded-full transform -translate-x-1/2"
@@ -722,98 +784,11 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
           )}
         </motion.div>
         
-        {/* Enhanced Sidebar */}
+        {/* Sidebar */}
         <motion.div 
           variants={itemVariants}
           className="lg:w-80 flex flex-col space-y-6"
         >
-          {/* Background Audio Section */}
-          <div className="bg-white/[0.02] backdrop-blur-sm rounded-3xl p-6 border border-white/[0.05] shadow-2xl">
-            <h3 className="text-xl font-light mb-4 flex items-center gap-2">
-              <Volume2 className="w-5 h-5 text-green-400" />
-              Background Audio
-            </h3>
-            
-            {backgroundTrack && (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="mb-4 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 p-4 rounded-2xl"
-              >
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h4 className="font-medium text-white">{backgroundTrack.title}</h4>
-                    <div className="text-sm text-white/60 mt-1">
-                      {backgroundTrack.mood} • {backgroundTrack.duration}
-                    </div>
-                  </div>
-                  <motion.button 
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className={`p-2 rounded-lg ${
-                      bgAudioPlaying ? 'bg-green-500/20' : 'bg-white/10'
-                    }`}
-                    onClick={toggleBackgroundAudio}
-                  >
-                    {bgAudioPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                  </motion.button>
-                </div>
-                <div className="flex flex-wrap gap-1">
-                  {backgroundTrack.tags.map((tag, i) => (
-                    <span 
-                      key={i}
-                      className="text-xs bg-white/20 text-white/80 px-2 py-1 rounded-lg"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-            
-            <div className="space-y-3 max-h-[300px] overflow-y-auto">
-              {pcmTracks.map(track => (
-                <motion.button
-                  key={track.id}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className={`w-full text-left p-3 rounded-xl transition-all ${
-                    backgroundTrack?.id === track.id
-                      ? 'bg-purple-600/20 border border-purple-500'
-                      : 'bg-white/[0.03] hover:bg-white/[0.05] border border-white/[0.05]'
-                  }`}
-                  onClick={() => handleTrackSelect(track)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <h4 className="font-medium text-white text-sm">{track.title}</h4>
-                      <div className="text-xs text-white/60 mt-1">
-                        {track.mood} • {track.duration} • {track.key}
-                      </div>
-                    </div>
-                    <div className="flex gap-1">
-                      {track.bpm > 0 && (
-                        <span className="text-xs bg-white/10 px-2 py-1 rounded">
-                          {track.bpm} BPM
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {track.tags.slice(0, 3).map((tag, i) => (
-                      <span 
-                        key={i}
-                        className="text-xs bg-white/10 text-white/70 px-2 py-1 rounded"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </motion.button>
-              ))}
-            </div>
-          </div>
-          
           {/* Current Chapter Info */}
           <div className="bg-white/[0.02] backdrop-blur-sm rounded-3xl p-6 border border-white/[0.05] shadow-2xl flex-1">
             <h3 className="text-xl font-light mb-4 flex items-center gap-2">
@@ -851,11 +826,82 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
                     </li>
                   </ul>
                 </div>
+                {/* Test Modules Button */}
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowTestModules(true)}
+                  className="mt-4 w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-xl text-white font-medium flex items-center justify-center gap-2"
+                >
+                  <Brain className="w-5 h-5" />
+                  Test Modules
+                </motion.button>
               </div>
             )}
           </div>
         </motion.div>
       </div>
+      
+      {/* Test Modules Modal */}
+      <AnimatePresence>
+        {showTestModules && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.5 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black z-[99]"
+              onClick={() => setShowTestModules(false)}
+            />
+            <motion.div
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white/[0.02] backdrop-blur-sm rounded-3xl border border-white/[0.05] shadow-2xl p-6 z-[100] w-full max-w-md"
+            >
+              <h3 className="text-xl font-medium text-white mb-4 flex items-center gap-2">
+                <Brain className="w-5 h-5 text-purple-400" />
+                Test Modules
+              </h3>
+              <div className="space-y-4">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-xl text-white font-medium text-left"
+                  onClick={() => console.log('Quiz selected')}
+                >
+                  Quiz
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded-xl text-white font-medium text-left"
+                  onClick={() => console.log('Competitive Arena selected')}
+                >
+                  Competitive Arena
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl text-white font-medium text-left"
+                  onClick={() => console.log('Bug Hunter selected')}
+                >
+                  Bug Hunter
+                </motion.button>
+              </div>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setShowTestModules(false)}
+                className="mt-6 w-full px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded-xl text-white font-medium"
+              >
+                Close
+              </motion.button>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
       
       {/* Footer Info */}
       <motion.div 
@@ -866,7 +912,7 @@ const YouTubePlayer: React.FC<YouTubePlayerProps> = ({
           Enhanced Interactive Player • Video ID: <span className="text-white font-medium">{videoData.id}</span>
         </p>
         <p className="text-white/40 text-xs mt-1">
-          Featuring {timestamps.length} interactive learning checkpoints
+          Featuring {stableTimestamps.length} interactive learning checkpoints
         </p>
       </motion.div>
     </motion.div>
