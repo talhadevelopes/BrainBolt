@@ -392,7 +392,7 @@ export const Team = () => {
           className="mt-32 text-center"
         >
           <motion.p variants={itemVariants} className="text-lg text-white/30 font-light max-w-2xl mx-auto">
-            Building tomorrow's learning experiences, today.
+            Building tomorrow's learning experiences, <span className="bg-gradient-to-r from-blue-400 to-purple-400 text-transparent bg-clip-text font-medium">today</span>.
           </motion.p>
         </motion.div>
       </div>

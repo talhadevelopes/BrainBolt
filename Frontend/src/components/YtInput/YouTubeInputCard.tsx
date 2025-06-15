@@ -4,16 +4,19 @@ import {
   ArrowRight, 
   Loader, 
   CheckCircle2, 
-  Search,  
+  Search, 
+  Clock, 
   Download, 
   Upload, 
   Trash2, 
   Zap,
   Microscope,
+  AlertCircle,
+  Info,
 } from 'lucide-react';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { History } from './History';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface HistoryItem {
   track: string;
@@ -44,6 +47,12 @@ const itemVariants: Variants = {
   },
 };
 
+const toastVariants: Variants = {
+  initial: { opacity: 0, x: 100 },
+  animate: { opacity: 1, x: 0 },
+  exit: { opacity: 0, x: 100 },
+};
+
 const trackOptions = [
   {
     id: 'Science',
@@ -59,12 +68,13 @@ const trackOptions = [
     description: 'Apply science to design and build innovative solutions',
     icon: <Zap className="w-6 h-6" />,
     gradient: 'from-green-400 via-blue-400 to-purple-400',
-    subjects: ['Mechanical', 'Electrical', 'Civil', 'Computer', 'Chemical'],
+    subjects: ['Information Technology', 'CSE', 'EEE', 'ECE'],
   },
 ];
 
 export const YouTubeLearningPortal = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [url, setUrl] = useState('');
   const [videoId, setVideoId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -93,28 +103,51 @@ export const YouTubeLearningPortal = () => {
         const parsedHistory = JSON.parse(savedHistory);
         if (parsedHistory.length > 0) {
           if (typeof parsedHistory[0] === 'string') {
-            const convertedHistory = parsedHistory.map((url: string) => ({
+            const convertedHistory: HistoryItem[] = parsedHistory.map((url: string) => ({
               url,
               timestamp: Date.now(),
+              track: 'Unknown',
             }));
             setHistory(convertedHistory);
             localStorage.setItem('youtubeUrlHistory', JSON.stringify(convertedHistory));
           } else {
-            setHistory(parsedHistory);
+            const validatedHistory: HistoryItem[] = parsedHistory.map((item: any) => ({
+              url: item.url,
+              timestamp: item.timestamp || Date.now(),
+              track: item.track || 'Unknown',
+            }));
+            setHistory(validatedHistory);
+            localStorage.setItem('youtubeUrlHistory', JSON.stringify(validatedHistory));
           }
         }
       } catch (error) {
         console.error('Error parsing history:', error);
       }
     }
-
-    navigator.clipboard.readText().then(text => {
-      if (text.includes('youtube.com/') || text.includes('youtu.be/')) {
-        setUrl(text);
-        toast.info('YouTube URL detected and pasted!');
-      }
-    }).catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (location.pathname === '/input') {
+      navigator.clipboard.readText().then(text => {
+        if (isValidYouTubeUrl(text)) {
+          setUrl(text);
+          toast.info(
+            <motion.div
+              variants={toastVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+            >
+              <Info className="w-5 h-5 text-blue-400" />
+              <span className="text-sm font-light text-white">YouTube URL detected and pasted!</span>
+            </motion.div>,
+            { autoClose: 3000 }
+          );
+        }
+      }).catch(() => {});
+    }
+  }, [location.pathname]);
 
   const isValidYouTubeUrl = (url: string): boolean => {
     const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
@@ -127,7 +160,7 @@ export const YouTubeLearningPortal = () => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const updateHistory = (urlToSave: string) => {
+  const updateHistory = (urlToSave: string, track: string) => {
     const existingIndex = history.findIndex(item => item.url === urlToSave);
     let updatedHistory: HistoryItem[];
     
@@ -135,15 +168,12 @@ export const YouTubeLearningPortal = () => {
       const newHistory = [...history];
       newHistory.splice(existingIndex, 1);
       updatedHistory = [
-        {
-          url: urlToSave, timestamp: Date.now(),
-          track: ''
-        },
+        { url: urlToSave, timestamp: Date.now(), track },
         ...newHistory,
       ];
     } else {
       updatedHistory = [
-        { url: urlToSave, timestamp: Date.now(), track: '' },
+        { url: urlToSave, timestamp: Date.now(), track },
         ...history,
       ].slice(0, 20);
     }
@@ -175,7 +205,8 @@ export const YouTubeLearningPortal = () => {
       timeoutId = setTimeout(() => {
         localStorage.setItem('currentVideoId', videoId);
         localStorage.setItem('selectedTrack', selectedTrack);
-        navigate('/content', { state: { videoId, track: selectedTrack } });
+        const route = selectedTrack === 'Engineering' ? '/stem' : '/pcm';
+        navigate(route, { state: { videoId, track: selectedTrack } });
       }, 3000);
     }
     return () => clearTimeout(timeoutId);
@@ -185,14 +216,38 @@ export const YouTubeLearningPortal = () => {
     setIsLoading(true);
     try {
       if (!url) {
-        toast.error('Please enter a YouTube URL');
+        toast.error(
+          <motion.div
+            variants={toastVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Please enter a YouTube URL</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
         setIsLoading(false);
         return;
       }
 
       const extractedId = extractVideoId(url);
       if (!extractedId) {
-        toast.error('Invalid YouTube URL');
+        toast.error(
+          <motion.div
+            variants={toastVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Invalid YouTube URL</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
         setIsLoading(false);
         return;
       }
@@ -201,7 +256,19 @@ export const YouTubeLearningPortal = () => {
       setShowTrackSelection(true);
       setIsLoading(false);
     } catch (error) {
-      toast.error('Error processing video URL');
+      toast.error(
+        <motion.div
+          variants={toastVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-sm font-light text-white">Error processing video URL</span>
+        </motion.div>,
+        { autoClose: 3000 }
+      );
       setIsLoading(false);
     }
   };
@@ -211,16 +278,43 @@ export const YouTubeLearningPortal = () => {
     setIsLoading(true);
 
     try {
-      updateHistory(url);
+      updateHistory(url, track);
       localStorage.setItem('currentVideoId', videoId);
       setIsExtracted(true);
-      toast.success('Video ID extracted and stored');
+      toast.success(
+        <motion.div
+          variants={toastVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+        >
+          <CheckCircle2 className="w-5 h-5 text-green-400" />
+          <span className="text-sm font-light text-white">Video ID extracted and stored</span>
+        </motion.div>,
+        { autoClose: 3000 }
+      );
     } catch (error) {
-      toast.error('Error processing video');
+      toast.error(
+        <motion.div
+          variants={toastVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+        >
+          <AlertCircle className="w-5 h-5 text-red-400" />
+          <span className="text-sm font-light text-white">Error processing video</span>
+        </motion.div>,
+        { autoClose: 3000 }
+      );
       setIsLoading(false);
     }
   };
 
+  const filteredHistory = history.filter(item =>
+    item.url.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleExportHistory = () => {
     const dataStr = JSON.stringify(history, null, 2);
@@ -231,7 +325,19 @@ export const YouTubeLearningPortal = () => {
     link.download = `youtube-learning-history-${new Date().toISOString().split('T')[0]}.json`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success('History exported successfully!');
+    toast.success(
+      <motion.div
+        variants={toastVariants}
+        initial="initial"
+        animate="animate"
+        exit="exit"
+        className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+      >
+        <CheckCircle2 className="w-5 h-5 text-green-400" />
+        <span className="text-sm font-light text-white">History exported successfully!</span>
+      </motion.div>,
+      { autoClose: 3000 }
+    );
   };
 
   const handleImportHistory = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -242,11 +348,40 @@ export const YouTubeLearningPortal = () => {
     reader.onload = (e) => {
       try {
         const importedHistory = JSON.parse(e.target?.result as string);
-        setHistory(importedHistory);
-        localStorage.setItem('youtubeUrlHistory', JSON.stringify(importedHistory));
-        toast.success('History imported successfully!');
+        const validatedHistory: HistoryItem[] = importedHistory.map((item: any) => ({
+          url: item.url,
+          timestamp: item.timestamp || Date.now(),
+          track: item.track || 'Unknown',
+        }));
+        setHistory(validatedHistory);
+        localStorage.setItem('youtubeUrlHistory', JSON.stringify(validatedHistory));
+        toast.success(
+          <motion.div
+            variants={toastVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+          >
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-light text-white">History imported successfully!</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
       } catch (error) {
-        toast.error('Error importing history file');
+        toast.error(
+          <motion.div
+            variants={toastVariants}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light text-white">Error importing history file</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
       }
     };
     reader.readAsText(file);
@@ -256,7 +391,18 @@ export const YouTubeLearningPortal = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      {/* Hexagonal Background Pattern */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        className="mt-4 mr-4"
+      />
       <motion.div
         animate={{
           opacity: [0.04, 0.06, 0.04],
@@ -305,8 +451,6 @@ export const YouTubeLearningPortal = () => {
           <rect width="100%" height="100%" fill="url(#hexagons)" />
         </svg>
       </motion.div>
-
-      {/* Animated hexagonal elements */}
       <motion.div
         animate={{
           rotate: [0, 360],
@@ -329,8 +473,6 @@ export const YouTubeLearningPortal = () => {
           />
         </svg>
       </motion.div>
-
-      {/* Floating elements */}
       <motion.div
         animate={{
           scale: [1, 1.05, 1],
@@ -346,7 +488,6 @@ export const YouTubeLearningPortal = () => {
       >
         <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full blur-3xl transform rotate-45" />
       </motion.div>
-
       <div className="container mx-auto px-6 py-12 relative z-10 max-w-7xl">
         <motion.div
           variants={containerVariants}
@@ -354,12 +495,10 @@ export const YouTubeLearningPortal = () => {
           animate="visible"
           className="grid grid-cols-1 lg:grid-cols-3 gap-8"
         >
-          {/* Main Input Section */}
           <motion.div
             variants={itemVariants}
             className="lg:col-span-2 space-y-8"
           >
-            {/* Header */}
             <div className="text-center lg:text-left">
               <motion.p
                 variants={itemVariants}
@@ -371,7 +510,7 @@ export const YouTubeLearningPortal = () => {
                 variants={itemVariants}
                 className="text-4xl lg:text-6xl font-light text-white mb-4 tracking-tight leading-[0.9]"
               >
-                YouTube
+                NextGen
               </motion.h1>
               <motion.h1
                 variants={itemVariants}
@@ -403,13 +542,10 @@ export const YouTubeLearningPortal = () => {
                 Transform videos into personalized learning experiences
               </motion.p>
             </div>
-
-            {/* URL Input Card */}
             <motion.div
               variants={itemVariants}
               className="relative p-8 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] overflow-hidden"
             >
-              {/* URL Input */}
               <div className="space-y-6">
                 <div className="relative">
                   <input
@@ -418,15 +554,13 @@ export const YouTubeLearningPortal = () => {
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
                     placeholder="Paste YouTube URL here..."
-                    className="w-full bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 px-6 py-4 text-white placeholder-white/40 focus:outline-none focus:border-white/20 transition-all text-lg font-light"
+                    className="w-full bg-white/5 backdrop-blur-lg rounded-2xl border border-white/10 px-6 py-4 pr-12 text-white placeholder-white/40 focus:outline-none focus:border-white/20 transition-all text-lg font-light"
                     disabled={isExtracted}
                   />
                   {isValidUrl && (
                     <CheckCircle2 className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-green-400" />
                   )}
                 </div>
-
-                {/* Processing UI */}
                 <AnimatePresence>
                   {isExtracted && (
                     <motion.div
@@ -447,7 +581,6 @@ export const YouTubeLearningPortal = () => {
                           Processing video content for {selectedTrack} Track...
                         </span>
                       </div>
-
                       <motion.div
                         initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
@@ -460,7 +593,6 @@ export const YouTubeLearningPortal = () => {
                           className="rounded-xl border border-white/10 shadow-lg max-w-sm w-full object-cover"
                         />
                       </motion.div>
-
                       <div className="space-y-3 relative z-10">
                         <p className="font-light tracking-wide text-neutral-300">Extracted Video ID:</p>
                         <motion.div
@@ -485,8 +617,6 @@ export const YouTubeLearningPortal = () => {
                     </motion.div>
                   )}
                 </AnimatePresence>
-
-                {/* Action Button */}
                 <motion.button
                   onClick={handleAnalyze}
                   disabled={!isValidUrl || isLoading || isExtracted}
@@ -511,8 +641,6 @@ export const YouTubeLearningPortal = () => {
                   )}
                 </motion.button>
               </div>
-
-              {/* Keyboard Shortcuts */}
               <div className="mt-6 pt-6 border-t border-white/10">
                 <p className="text-sm text-white/40 mb-2 font-medium">Keyboard Shortcuts:</p>
                 <div className="grid grid-cols-2 gap-2 text-xs text-white/30">
@@ -524,14 +652,11 @@ export const YouTubeLearningPortal = () => {
               </div>
             </motion.div>
           </motion.div>
-
-          {/* History Sidebar */}
           <motion.div
             variants={itemVariants}
             className="space-y-6"
           >
-            {/* History Card */}
-            <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
+            <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05] relative z-20">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-light">Learning History</h2>
                 <div className="flex gap-2">
@@ -553,7 +678,19 @@ export const YouTubeLearningPortal = () => {
                     onClick={() => {
                       setHistory([]);
                       localStorage.removeItem('youtubeUrlHistory');
-                      toast.success('History cleared');
+                      toast.success(
+                        <motion.div
+                          variants={toastVariants}
+                          initial="initial"
+                          animate="animate"
+                          exit="exit"
+                          className="flex items-center gap-3 p-3 bg-gray-900/90 rounded-xl shadow-lg"
+                        >
+                          <CheckCircle2 className="w-5 h-5 text-green-400" />
+                          <span className="text-sm font-light text-white">History cleared</span>
+                        </motion.div>,
+                        { autoClose: 3000 }
+                      );
                     }}
                     className="p-2 bg-red-500/20 rounded-lg border border-red-500/30 hover:bg-red-500/30 transition-all"
                     title="Clear history"
@@ -562,8 +699,6 @@ export const YouTubeLearningPortal = () => {
                   </button>
                 </div>
               </div>
-
-              {/* Search */}
               <div className="relative mb-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-white/40" />
                 <input
@@ -574,15 +709,33 @@ export const YouTubeLearningPortal = () => {
                   className="w-full bg-white/5 rounded-lg border border-white/10 pl-10 pr-4 py-2 text-white placeholder-white/40 focus:outline-none focus:border-white/20"
                 />
               </div>
-
-              {/* History Component */}
-              <History
-                onSelectUrl={setUrl}
-                currentUrl={url}
-              />
+              <div className="mt-4 max-h-96 overflow-y-auto">
+                {filteredHistory.length > 0 ? (
+                  filteredHistory.map((item, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="p-3 mb-2 rounded-lg bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all cursor-pointer"
+                      onClick={() => setUrl(item.url)}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-white truncate">{item.url}</p>
+                          <div className="flex items-center mt-1 text-xs text-white/60">
+                            <Clock className="w-3 h-3 mr-1" />
+                            {new Date(item.timestamp).toLocaleString()}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <p className="text-white/60 text-sm text-center">No history available</p>
+                )}
+              </div>
             </div>
-
-            {/* Stats Card */}
             <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
               <h3 className="text-lg font-light mb-4">Learning Stats</h3>
               <div className="space-y-3">
@@ -615,8 +768,6 @@ export const YouTubeLearningPortal = () => {
           </motion.div>
         </motion.div>
       </div>
-
-      {/* Track Selection Modal */}
       <AnimatePresence>
         {showTrackSelection && (
           <motion.div
@@ -637,7 +788,6 @@ export const YouTubeLearningPortal = () => {
                 <h2 className="text-3xl font-light text-white mb-2">Select Your Track</h2>
                 <p className="text-white/60 font-light">Choose the learning path that best fits your goals</p>
               </div>
-
               {!isLoading ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {trackOptions.map((track) => (
@@ -693,7 +843,6 @@ export const YouTubeLearningPortal = () => {
                   </p>
                 </div>
               )}
-
               {!isLoading && (
                 <div className="mt-8 pt-6 border-t border-white/10 text-center">
                   <button
@@ -708,8 +857,6 @@ export const YouTubeLearningPortal = () => {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Hidden File Input */}
       <input
         ref={fileInputRef}
         type="file"
