@@ -5,10 +5,14 @@ import { YouTubePlayer } from "../components/STEM/YoutubePlayer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSteamStore } from "../stores/STEMstore";
 import ModuleStem from "../components/STEM/ModuleSTEM";
-
+import { QuizArena } from "../components/CP/QuizArena"; // Adjust path as needed
 import { ModuleData } from "./Linear/Data/moduleData";
+import { useNavigate } from "react-router-dom";
+import { CompetitiveArena } from "./CP/CompetitiveArena";
+import { BugHunter } from "./CP/BugHunterArena";
 
 export function STEM() {
+  const navigate = useNavigate();
   const {
     videoId,
     transcript,
@@ -29,6 +33,9 @@ export function STEM() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showTestModal, setShowTestModal] = useState(false);
+  const [showQuizArena, setShowQuizArena] = useState(false);
+  const [showCompetitiveArena, setShowCompetitiveArena] = useState(false);
+  const [showBugHunter, setShowBugHunter] = useState(false); // New state for BugHunter
   const moduleTriggeredRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -39,13 +46,17 @@ export function STEM() {
     console.log("STEM modules:", modules);
   }, [modules]);
 
+  useEffect(() => {
+    console.log("showBugHunter:", showBugHunter); // Debug modal state
+  }, [showBugHunter]);
+
   const handlePlayerReady = (event: any) => {
     setPlayerInstance(event.target);
     const playerDuration = event.target.getDuration();
     console.log("Player duration:", playerDuration);
     setDuration(
       playerDuration > 0 && !isNaN(playerDuration) ? playerDuration : 2068
-    ); // Fallback to 34:28
+    );
     event.target.playVideo();
     setIsPlaying(true);
   };
@@ -146,20 +157,16 @@ export function STEM() {
   };
 
   const handleSelectTestType = (type: "quiz" | "competitive" | "bugHunter") => {
+    console.log("Selected test type:", type); // Debug test type
     setCurrentActiveModule(null);
     setShowTestModal(false);
     handleContinueLearning();
-    let path = "";
-    switch (type) {
-      case "quiz":
-        path = "/quiz";
-        break;
-      case "competitive":
-        path = "/cp";
-        break;
-      case "bugHunter":
-        path = "/bughunter";
-        break;
+    if (type === "quiz") {
+      setShowQuizArena(true);
+    } else if (type === "competitive") {
+      setShowCompetitiveArena(true);
+    } else if (type === "bugHunter") {
+      setShowBugHunter(true); // Show BugHunter popup
     }
   };
 
@@ -174,6 +181,20 @@ export function STEM() {
 
   const handleTestModule = () => {
     setShowTestModal(true);
+  };
+
+  const handleCloseQuizArena = () => {
+    setShowQuizArena(false);
+  };
+
+  const handleCloseCompetitiveArena = () => {
+    console.log("Closing CompetitiveArena"); // Debug close
+    setShowCompetitiveArena(false);
+  };
+
+  const handleCloseBugHunter = () => {
+    console.log("Closing BugHunter"); // Debug close
+    setShowBugHunter(false);
   };
 
   return (
@@ -475,116 +496,239 @@ export function STEM() {
             )}
 
             <AnimatePresence>
-              {currentActiveModule && !showTestModal && (
-                <motion.div
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 50 }}
-                  style={{
-                    position: "fixed",
-                    inset: 0,
-                    backgroundColor: "rgba(0,0,0,0.8)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    zIndex: 50,
-                    padding: "16px",
-                  }}
-                >
-                  <div
+              {currentActiveModule &&
+                !showTestModal &&
+                !showQuizArena &&
+                !showCompetitiveArena &&
+                !showBugHunter && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 50 }}
                     style={{
-                      background:
-                        "linear-gradient(to bottom right, #1e3a8a, #4c1d95)",
-                      border: "1px solid #2563eb",
-                      color: "#fff",
-                      maxWidth: "600px",
-                      width: "100%",
-                      padding: "32px",
-                      textAlign: "center",
-                      borderRadius: "12px",
-                      boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
+                      position: "fixed",
+                      inset: 0,
+                      backgroundColor: "rgba(0,0,0,0.8)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 50,
+                      padding: "16px",
                     }}
                   >
-                    <h2
-                      style={{
-                        fontSize: "36px",
-                        fontWeight: "800",
-                        color: "#fcd34d",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      Learning Module Activated!
-                    </h2>
-                    <p style={{ fontSize: "20px", marginBottom: "16px" }}>
-                      Paused at {formatTime(currentActiveModule.timestamp)}
-                    </p>
-                    <h3
-                      style={{
-                        fontSize: "28px",
-                        fontWeight: "bold",
-                        marginBottom: "16px",
-                      }}
-                    >
-                      {currentActiveModule.name}
-                    </h3>
-                    <p
-                      style={{
-                        fontSize: "18px",
-                        color: "#e2e8f0",
-                        marginBottom: "32px",
-                      }}
-                    >
-                      {currentActiveModule.description}
-                    </p>
                     <div
                       style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        gap: "16px",
+                        background:
+                          "linear-gradient(to bottom right, #1e3a8a, #4c1d95)",
+                        border: "1px solid #2563eb",
+                        color: "#fff",
+                        maxWidth: "600px",
+                        width: "100%",
+                        padding: "32px",
+                        textAlign: "center",
+                        borderRadius: "12px",
+                        boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
                       }}
                     >
-                      <button
-                        onClick={handleContinueLearning}
+                      <h2
                         style={{
-                          backgroundColor: "#10b981",
-                          color: "#fff",
-                          fontSize: "18px",
-                          padding: "12px 32px",
-                          borderRadius: "9999px",
-                          fontWeight: "bold",
-                          cursor: "pointer",
-                          border: "none",
-                          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                          transition: "background-color 0.2s",
+                          fontSize: "36px",
+                          fontWeight: "800",
+                          color: "#fcd34d",
+                          marginBottom: "16px",
                         }}
                       >
-                        Continue Video
-                      </button>
-                      <button
-                        onClick={handleTestModule}
+                        Learning Module Activated!
+                      </h2>
+                      <p style={{ fontSize: "20px", marginBottom: "16px" }}>
+                        Paused at {formatTime(currentActiveModule.timestamp)}
+                      </p>
+                      <h3
                         style={{
-                          backgroundColor: "#f97316",
-                          color: "#fff",
-                          fontSize: "18px",
-                          padding: "12px 32px",
-                          borderRadius: "9999px",
+                          fontSize: "28px",
                           fontWeight: "bold",
-                          cursor: "pointer",
-                          border: "none",
-                          boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                          transition: "background-color 0.2s",
+                          marginBottom: "16px",
                         }}
                       >
-                        Test Module
-                      </button>
+                        {currentActiveModule.title}
+                      </h3>
+                      <p
+                        style={{
+                          fontSize: "18px",
+                          color: "#e2e8f0",
+                          marginBottom: "32px",
+                        }}
+                      >
+                        {currentActiveModule.description}
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "center",
+                          gap: "16px",
+                        }}
+                      >
+                        <button
+                          onClick={handleContinueLearning}
+                          style={{
+                            backgroundColor: "#10b981",
+                            color: "#fff",
+                            fontSize: "18px",
+                            padding: "12px 32px",
+                            borderRadius: "9999px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            border: "none",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                            transition: "background-color 0.2s",
+                          }}
+                        >
+                          Continue Video
+                        </button>
+                        <button
+                          onClick={handleTestModule}
+                          style={{
+                            backgroundColor: "#f97316",
+                            color: "#fff",
+                            fontSize: "18px",
+                            padding: "12px 32px",
+                            borderRadius: "9999px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            border: "none",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                            transition: "background-color 0.2s",
+                          }}
+                        >
+                          Test Module
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              )}
+                  </motion.div>
+                )}
             </AnimatePresence>
 
             <AnimatePresence>
-              {showTestModal && (
+              {showTestModal &&
+                !showQuizArena &&
+                !showCompetitiveArena &&
+                !showBugHunter && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      backgroundColor: "rgba(0,0,0,0.7)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      zIndex: 60,
+                      padding: "16px",
+                    }}
+                  >
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.9, opacity: 0 }}
+                      style={{
+                        backgroundColor: "#1e293b",
+                        color: "#fff",
+                        border: "1px solid #475569",
+                        borderRadius: "8px",
+                        padding: "24px",
+                        maxWidth: "500px",
+                        width: "100%",
+                        boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          fontSize: "24px",
+                          fontWeight: "bold",
+                          color: "#60a5fa",
+                          marginBottom: "24px",
+                        }}
+                      >
+                        Select Test Type for {currentActiveModule?.title}
+                      </h3>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "1fr",
+                          gap: "16px",
+                        }}
+                      >
+                        <button
+                          onClick={() => handleSelectTestType("quiz")}
+                          style={{
+                            backgroundColor: "#9333ea",
+                            color: "#fff",
+                            padding: "16px",
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            border: "none",
+                            transition: "background-color 0.2s",
+                          }}
+                        >
+                          Quiz
+                        </button>
+                        <button
+                          onClick={() => handleSelectTestType("competitive")}
+                          style={{
+                            backgroundColor: "#ef4444",
+                            color: "#fff",
+                            padding: "16px",
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            border: "none",
+                            transition: "background-color 0.2s",
+                          }}
+                        >
+                          Competitive Arena
+                        </button>
+                        <button
+                          onClick={() => handleSelectTestType("bugHunter")}
+                          style={{
+                            backgroundColor: "#f59e0b",
+                            color: "#fff",
+                            padding: "16px",
+                            borderRadius: "8px",
+                            fontWeight: "bold",
+                            cursor: "pointer",
+                            border: "none",
+                            transition: "background-color 0.2s",
+                          }}
+                        >
+                          Bug Hunter
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => setShowTestModal(false)}
+                        style={{
+                          marginTop: "24px",
+                          backgroundColor: "#475569",
+                          color: "#fff",
+                          padding: "10px 20px",
+                          borderRadius: "8px",
+                          fontWeight: "bold",
+                          cursor: "pointer",
+                          border: "none",
+                          transition: "background-color 0.2s",
+                        }}
+                      >
+                        Close
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showQuizArena && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -596,8 +740,9 @@ export function STEM() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    zIndex: 60,
+                    zIndex: 70,
                     padding: "16px",
+                    overflowY: "auto",
                   }}
                 >
                   <motion.div
@@ -608,92 +753,201 @@ export function STEM() {
                       backgroundColor: "#1e293b",
                       color: "#fff",
                       border: "1px solid #475569",
-                      borderRadius: "8px",
+                      borderRadius: "12px",
                       padding: "24px",
-                      maxWidth: "500px",
-                      width: "100%",
+                      maxWidth: "1000px",
+                      width: "90%",
+                      maxHeight: "90vh",
+                      overflowY: "auto",
                       boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                      position: "relative",
                     }}
                   >
-                    <h3
-                      style={{
-                        fontSize: "24px",
-                        fontWeight: "bold",
-                        color: "#60a5fa",
-                        marginBottom: "24px",
-                      }}
-                    >
-                      Select Test Type for {currentActiveModule?.name}
-                    </h3>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr",
-                        gap: "16px",
-                      }}
-                    >
-                      <button
-                        onClick={() => handleSelectTestType("quiz")}
-                        style={{
-                          backgroundColor: "#9333ea",
-                          color: "#fff",
-                          padding: "16px",
-                          borderRadius: "8px",
-                          fontWeight: "bold",
-                          cursor: "pointer",
-                          border: "none",
-                          transition: "background-color 0.2s",
-                        }}
-                      >
-                        Quiz
-                      </button>
-                      <button
-                        onClick={() => handleSelectTestType("competitive")}
-                        style={{
-                          backgroundColor: "#ef4444",
-                          color: "#fff",
-                          padding: "16px",
-                          borderRadius: "8px",
-                          fontWeight: "bold",
-                          cursor: "pointer",
-                          border: "none",
-                          transition: "background-color 0.2s",
-                        }}
-                      >
-                        Competitive Arena
-                      </button>
-                      <button
-                        onClick={() => handleSelectTestType("bugHunter")}
-                        style={{
-                          backgroundColor: "#f59e0b",
-                          color: "#fff",
-                          padding: "16px",
-                          borderRadius: "8px",
-                          fontWeight: "bold",
-                          cursor: "pointer",
-                          border: "none",
-                          transition: "background-color 0.2s",
-                        }}
-                      >
-                        Bug Hunter
-                      </button>
-                    </div>
                     <button
-                      onClick={() => setShowTestModal(false)}
+                      onClick={handleCloseQuizArena}
                       style={{
-                        marginTop: "24px",
-                        backgroundColor: "#475569",
+                        position: "absolute",
+                        top: "16px",
+                        right: "16px",
+                        backgroundColor: "#ef4444",
                         color: "#fff",
-                        padding: "10px 20px",
-                        borderRadius: "8px",
-                        fontWeight: "bold",
-                        cursor: "pointer",
+                        padding: "8px",
+                        borderRadius: "50%",
                         border: "none",
-                        transition: "background-color 0.2s",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
                       }}
                     >
-                      Close
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
                     </button>
+                    <QuizArena initialVideoId={videoId} />
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showCompetitiveArena && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: "fixed",
+                    inset: 0,
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 70,
+                    padding: "16px",
+                    overflowY: "auto",
+                  }}
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    style={{
+                      backgroundColor: "#1e293b",
+                      color: "#fff",
+                      border: "1px solid #475569",
+                      borderRadius: "12px",
+                      padding: "24px",
+                      maxWidth: "1000px",
+                      width: "90%",
+                      maxHeight: "90vh",
+                      overflowY: "auto",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                      position: "relative",
+                    }}
+                  >
+                    <button
+                      onClick={handleCloseCompetitiveArena}
+                      style={{
+                        position: "absolute",
+                        top: "16px",
+                        right: "16px",
+                        backgroundColor: "#ef4444",
+                        color: "#fff",
+                        padding: "8px",
+                        borderRadius: "50%",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                    <div>
+                      <CompetitiveArena initialVideoId={videoId} />
+                    </div>
+                  </motion.div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <AnimatePresence>
+              {showBugHunter && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  style={{
+                    position: "fixed",
+                    inset: 0,
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    zIndex: 70,
+                    padding: "16px",
+                    overflowY: "auto",
+                  }}
+                >
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    style={{
+                      backgroundColor: "#1e293b",
+                      color: "#fff",
+                      border: "1px solid #475569",
+                      borderRadius: "12px",
+                      padding: "24px",
+                      maxWidth: "1000px",
+                      width: "90%",
+                      maxHeight: "90vh",
+                      overflowY: "auto",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.2)",
+                      position: "relative",
+                    }}
+                  >
+                    <button
+                      onClick={handleCloseBugHunter}
+                      style={{
+                        position: "absolute",
+                        top: "16px",
+                        right: "16px",
+                        backgroundColor: "#ef4444",
+                        color: "#fff",
+                        padding: "8px",
+                        borderRadius: "50%",
+                        border: "none",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </button>
+                    <div>
+                      <BugHunter initialVideoId={videoId} />
+                    </div>
                   </motion.div>
                 </motion.div>
               )}
@@ -717,6 +971,39 @@ export function STEM() {
                 </h2>
               </motion.div>
             )}
+
+            <div className="flex w-full justify-between p-3">
+              <div>
+                <button
+                  className="bg-blue-600 px-6 py-2 rounded"
+                  onClick={() => setShowQuizArena(true)}
+                >
+                  Take Quiz
+                </button>
+              </div>
+              <div>
+                <button
+                  className="bg-blue-600 px-6 py-2 rounded"
+                  onClick={() => {
+                    console.log("Opening CompetitiveArena"); // Debug button click
+                    setShowCompetitiveArena(true);
+                  }}
+                >
+                  Coding Challenge
+                </button>
+              </div>
+              <div>
+                <button
+                  className="bg-blue-600 px-6 py-2 rounded"
+                  onClick={() => {
+                    console.log("Opening BugHunter"); // Debug button click
+                    setShowBugHunter(true); // Open BugHunter popup
+                  }}
+                >
+                  Bug Hunt
+                </button>
+              </div>
+            </div>
 
             <div style={{ marginTop: "48px" }}>
               <h2

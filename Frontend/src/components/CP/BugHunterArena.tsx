@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useRef, useState } from "react"
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Bug,
   Youtube,
@@ -18,13 +18,18 @@ import {
   ChevronDown,
   Eye,
   EyeOff,
-} from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import Editor from "@monaco-editor/react"
-import type * as monaco from "monaco-editor"
-import { useBugHunterStore } from "../../stores/bugHunterStore"
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Editor from "@monaco-editor/react";
+import type * as monaco from "monaco-editor";
+import { useBugHunterStore } from "../../stores/bugHunterStore";
 
-export const BugHunter = () => {
+interface BugHunterProps {
+  initialVideoId?: string; // New prop for pre-filling videoId
+}
+
+export const BugHunter: React.FC<BugHunterProps> = ({ initialVideoId }) => {
+  const [hasError, setHasError] = useState(false); // Error boundary state
   const {
     challenge,
     userCode,
@@ -50,31 +55,52 @@ export const BugHunter = () => {
     submitSolution,
     resetChallenge,
     reset,
-  } = useBugHunterStore()
+  } = useBugHunterStore();
 
-  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
-  const [theme, _setTheme] = useState("vs-dark")
-  const [fontSize, _setFontSize] = useState(14)
-  const [showTestDetails, setShowTestDetails] = useState<{ [key: number]: boolean }>({})
+  const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
+  const [theme, _setTheme] = useState("vs-dark");
+  const [fontSize, _setFontSize] = useState(14);
+  const [showTestDetails, setShowTestDetails] = useState<{
+    [key: number]: boolean;
+  }>({});
 
   // Initialize on mount
   useEffect(() => {
-    reset()
-  }, [reset])
+    console.log("BugHunter mounted, initialVideoId:", initialVideoId); // Debug mount
+    reset();
+    if (initialVideoId && initialVideoId.trim()) {
+      console.log("Setting videoId to:", initialVideoId); // Debug videoId
+      setVideoId(initialVideoId);
+    }
+    return () => console.log("BugHunter unmounted"); // Debug cleanup
+  }, [reset, setVideoId, initialVideoId]);
+
+  // Error boundary effect
+  useEffect(() => {
+    if (error) {
+      console.error("Store error:", error); // Debug store error
+      setHasError(true);
+    }
+  }, [error]);
 
   const handleVideoIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim()
-    setVideoId(value)
-  }
+    const value = e.target.value.trim();
+    console.log("Video ID changed to:", value); // Debug input
+    setVideoId(value);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      generateChallenge()
+      console.log("Enter pressed, generating challenge"); // Debug enter
+      generateChallenge();
     }
-  }
+  };
 
-  const handleEditorDidMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
-    editorRef.current = editor
+  const handleEditorDidMount = (
+    editor: monaco.editor.IStandaloneCodeEditor,
+    monacoInstance: typeof monaco
+  ) => {
+    editorRef.current = editor;
 
     editor.updateOptions({
       automaticLayout: true,
@@ -92,61 +118,72 @@ export const BugHunter = () => {
       autoClosingQuotes: "always",
       tabSize: 2,
       insertSpaces: true,
-    })
+    });
 
     // Add keyboard shortcuts
-    editor.addCommand(monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter, () => {
-      runTests()
-    })
+    editor.addCommand(
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.Enter,
+      () => {
+        runTests();
+      }
+    );
 
-    editor.addCommand(monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyS, () => {
-      submitSolution()
-    })
-  }
+    editor.addCommand(
+      monacoInstance.KeyMod.CtrlCmd | monacoInstance.KeyCode.KeyS,
+      () => {
+        submitSolution();
+      }
+    );
+  };
 
   const formatCode = () => {
     if (editorRef.current) {
-      editorRef.current.getAction("editor.action.formatDocument")?.run()
+      editorRef.current.getAction("editor.action.formatDocument")?.run();
     }
-  }
+  };
 
   const toggleHint = (index: number) => {
     if (currentHintIndex === index && showHints) {
-      setShowHints(false)
+      setShowHints(false);
     } else {
-      setCurrentHintIndex(index)
-      setShowHints(true)
+      setCurrentHintIndex(index);
+      setShowHints(true);
     }
-  }
+  };
 
   const toggleTestDetails = (index: number) => {
     setShowTestDetails((prev) => ({
       ...prev,
       [index]: !prev[index],
-    }))
-  }
+    }));
+  };
 
   const handleBugToggle = (bug: string) => {
     if (bugsFound.includes(bug)) {
-      removeBugFound(bug)
+      removeBugFound(bug);
     } else {
-      addBugFound(bug)
+      addBugFound(bug);
     }
-  }
+  };
 
   const getSuccessRate = () => {
-    if (testResults.length === 0) return 0
-    return (testResults.filter((test) => test.passed).length / testResults.length) * 100
-  }
+    if (testResults.length === 0) return 0;
+    return (
+      (testResults.filter((test) => test.passed).length / testResults.length) *
+      100
+    );
+  };
 
   const getCommonBugs = (challenge: any): string[] => {
-    if (!challenge) return []
+    if (!challenge) return [];
 
     // Extract potential bugs from the flawed code comments
-    const bugComments = challenge?.flawedCode.match(/\/\/.*[Bb]ug.*$/gm) || []
+    const bugComments = challenge?.flawedCode.match(/\/\/.*[Bb]ug.*$/gm) || [];
     const extractedBugs = bugComments
-      .map((comment: string) => comment.replace(/\/\/.*[Bb]ug\s*\d*:?\s*/i, "").trim())
-      .filter((bug: string) => bug.length > 0)
+      .map((comment: string) =>
+        comment.replace(/\/\/.*[Bb]ug\s*\d*:?\s*/i, "").trim()
+      )
+      .filter((bug: string) => bug.length > 0);
 
     // If no bugs found in comments, provide generic categories
     if (extractedBugs.length === 0) {
@@ -159,18 +196,26 @@ export const BugHunter = () => {
         "Function parameter error",
         "Return value error",
         "Loop condition error",
-      ]
+      ];
     }
 
-    return extractedBugs
+    return extractedBugs;
+  };
+
+  const commonBugs = getCommonBugs(challenge);
+
+  if (hasError) {
+    return (
+      <div className="text-center text-red-400 p-8">
+        <h2>Error loading Bug Hunter</h2>
+        <p>Please try again or check the console for details.</p>
+      </div>
+    );
   }
 
-  const commonBugs = getCommonBugs(challenge)
-
   return (
-    <section className="relative py-12 overflow-hidden bg-slate-900">
+    <section className="relative py-12 bg-slate-900">
       <div className="container mx-auto px-6">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -181,7 +226,10 @@ export const BugHunter = () => {
             <Bug className="h-12 w-12 text-red-400" />
             <span>
               Bug
-              <span className="bg-gradient-to-r from-red-400 to-orange-600 text-transparent bg-clip-text"> Hunter</span>
+              <span className="bg-gradient-to-r from-red-400 to-orange-600 text-transparent bg-clip-text">
+                {" "}
+                Hunter
+              </span>
             </span>
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -189,7 +237,6 @@ export const BugHunter = () => {
           </p>
         </motion.div>
 
-        {/* Video Input Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -198,12 +245,16 @@ export const BugHunter = () => {
         >
           <div className="flex items-center gap-3 mb-4">
             <Youtube className="h-6 w-6 text-red-400" />
-            <h3 className="text-xl font-semibold text-white">Generate Bug Hunt from YouTube Video</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Generate Bug Hunt from YouTube Video
+            </h3>
           </div>
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-300 mb-2">YouTube Video ID</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                YouTube Video ID
+              </label>
               <input
                 type="text"
                 value={videoId}
@@ -212,12 +263,17 @@ export const BugHunter = () => {
                 placeholder="Enter YouTube video ID (e.g., dQw4w9WgXcQ)"
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
               />
-              <p className="text-xs text-gray-400 mt-1">Generate a debugging challenge based on video content</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Generate a debugging challenge based on video content
+              </p>
             </div>
 
             <div className="flex items-end">
               <motion.button
-                onClick={generateChallenge}
+                onClick={() => {
+                  console.log("Generate Challenge clicked"); // Debug button
+                  generateChallenge();
+                }}
                 disabled={loading || !videoId.trim()}
                 className={`px-8 py-3 rounded-lg font-semibold flex items-center gap-3 transition-all duration-300 ${
                   loading || !videoId.trim()
@@ -243,20 +299,24 @@ export const BugHunter = () => {
           </div>
         </motion.div>
 
-        {/* Transcript Preview */}
         {transcript && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg"
           >
-            <h3 className="text-blue-300 font-medium mb-2">📝 Transcript Preview</h3>
-            <p className="text-blue-200 text-sm">{transcript.substring(0, 200)}...</p>
-            <p className="text-blue-400 text-xs mt-2">Length: {transcript.length} characters</p>
+            <h3 className="text-blue-300 font-medium mb-2">
+              📝 Transcript Preview
+            </h3>
+            <p className="text-blue-200 text-sm">
+              {transcript.substring(0, 200)}...
+            </p>
+            <p className="text-blue-400 text-xs mt-2">
+              Length: {transcript.length} characters
+            </p>
           </motion.div>
         )}
 
-        {/* Error Display */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -271,7 +331,6 @@ export const BugHunter = () => {
           </motion.div>
         )}
 
-        {/* Loading State */}
         {loading && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -287,7 +346,6 @@ export const BugHunter = () => {
           </motion.div>
         )}
 
-        {/* Stats Dashboard */}
         {stats.totalChallenges > 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -301,31 +359,36 @@ export const BugHunter = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-white">{stats.totalChallenges}</div>
+                <div className="text-2xl font-bold text-white">
+                  {stats.totalChallenges}
+                </div>
                 <div className="text-xs text-gray-400">Challenges</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-green-400">{stats.solvedChallenges}</div>
+                <div className="text-2xl font-bold text-green-400">
+                  {stats.solvedChallenges}
+                </div>
                 <div className="text-xs text-gray-400">Solved</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-blue-400">{stats.successRate.toFixed(1)}%</div>
+                <div className="text-2xl font-bold text-blue-400">
+                  {stats.successRate.toFixed(1)}%
+                </div>
                 <div className="text-xs text-gray-400">Success Rate</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-purple-400">{stats.averageTime.toFixed(1)}s</div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {stats.averageTime.toFixed(1)}s
+                </div>
                 <div className="text-xs text-gray-400">Avg Time</div>
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Main Challenge Interface */}
         {challenge && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Left Panel - Instructions & Hints */}
             <div className="space-y-6">
-              {/* Instructions */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -342,7 +405,6 @@ export const BugHunter = () => {
                 </div>
               </motion.div>
 
-              {/* Hints */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -360,10 +422,14 @@ export const BugHunter = () => {
                         onClick={() => toggleHint(index)}
                         className="w-full flex items-center justify-between p-3 bg-yellow-900/30 hover:bg-yellow-900/40 rounded-lg transition-colors"
                       >
-                        <span className="text-yellow-200 font-medium">Hint {index + 1}</span>
+                        <span className="text-yellow-200 font-medium">
+                          Hint {index + 1}
+                        </span>
                         <ChevronDown
                           className={`h-4 w-4 text-yellow-400 transition-transform ${
-                            showHints && currentHintIndex === index ? "rotate-180" : ""
+                            showHints && currentHintIndex === index
+                              ? "rotate-180"
+                              : ""
                           }`}
                         />
                       </button>
@@ -384,7 +450,6 @@ export const BugHunter = () => {
                 </div>
               </motion.div>
 
-              {/* Bug Tracker */}
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -397,7 +462,10 @@ export const BugHunter = () => {
                 </h3>
                 <div className="space-y-2">
                   {commonBugs.map((bug, index) => (
-                    <label key={index} className="flex items-center gap-3 cursor-pointer">
+                    <label
+                      key={index}
+                      className="flex items-center gap-3 cursor-pointer"
+                    >
                       <input
                         type="checkbox"
                         checked={bugsFound.includes(bug)}
@@ -405,7 +473,11 @@ export const BugHunter = () => {
                         className="w-4 h-4 text-red-500 bg-slate-700 border-slate-600 rounded focus:ring-red-500"
                       />
                       <span
-                        className={`text-sm ${bugsFound.includes(bug) ? "text-green-400 line-through" : "text-gray-300"}`}
+                        className={`text-sm ${
+                          bugsFound.includes(bug)
+                            ? "text-green-400 line-through"
+                            : "text-gray-300"
+                        }`}
                       >
                         {bug}
                       </span>
@@ -418,7 +490,6 @@ export const BugHunter = () => {
               </motion.div>
             </div>
 
-            {/* Center Panel - Code Editor */}
             <div className="space-y-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -426,7 +497,9 @@ export const BugHunter = () => {
                 className="bg-slate-900 rounded-lg border border-slate-700 overflow-hidden"
               >
                 <div className="flex items-center justify-between p-4 border-b border-slate-700 bg-slate-800">
-                  <h3 className="text-lg font-semibold text-white">Debug the Code</h3>
+                  <h3 className="text-lg font-semibold text-white">
+                    Debug the Code
+                  </h3>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={formatCode}
@@ -475,7 +548,6 @@ export const BugHunter = () => {
                 </div>
               </motion.div>
 
-              {/* Action Buttons */}
               <div className="flex gap-3">
                 <motion.button
                   onClick={runTests}
@@ -485,12 +557,18 @@ export const BugHunter = () => {
                       ? "bg-slate-700/50 cursor-not-allowed text-gray-400"
                       : "bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white shadow-lg"
                   }`}
-                  whileHover={!isRunning && userCode.trim() ? { scale: 1.02 } : {}}
-                  whileTap={!isRunning && userCode.trim() ? { scale: 0.98 } : {}}
+                  whileHover={
+                    !isRunning && userCode.trim() ? { scale: 1.02 } : {}
+                  }
+                  whileTap={
+                    !isRunning && userCode.trim() ? { scale: 0.98 } : {}
+                  }
                 >
                   <Play className="h-5 w-5" />
                   {isRunning ? "Running Tests..." : "Run Tests"}
-                  {!isRunning && <span className="text-xs opacity-70">(Ctrl+Enter)</span>}
+                  {!isRunning && (
+                    <span className="text-xs opacity-70">(Ctrl+Enter)</span>
+                  )}
                 </motion.button>
 
                 <motion.button
@@ -501,8 +579,12 @@ export const BugHunter = () => {
                       ? "bg-slate-700/50 cursor-not-allowed text-gray-400"
                       : "bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-lg"
                   }`}
-                  whileHover={!isSubmitting && userCode.trim() ? { scale: 1.02 } : {}}
-                  whileTap={!isSubmitting && userCode.trim() ? { scale: 0.98 } : {}}
+                  whileHover={
+                    !isSubmitting && userCode.trim() ? { scale: 1.02 } : {}
+                  }
+                  whileTap={
+                    !isSubmitting && userCode.trim() ? { scale: 0.98 } : {}
+                  }
                 >
                   <Send className="h-5 w-5" />
                   {isSubmitting ? "Submitting..." : "Submit Solution"}
@@ -510,9 +592,7 @@ export const BugHunter = () => {
               </div>
             </div>
 
-            {/* Right Panel - Test Results */}
             <div className="space-y-6">
-              {/* Test Results Summary */}
               {testResults.length > 0 && (
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
@@ -527,14 +607,22 @@ export const BugHunter = () => {
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-gray-300">Success Rate</span>
-                      <span className={`font-bold ${getSuccessRate() === 100 ? "text-green-400" : "text-yellow-400"}`}>
+                      <span
+                        className={`font-bold ${
+                          getSuccessRate() === 100
+                            ? "text-green-400"
+                            : "text-yellow-400"
+                        }`}
+                      >
                         {getSuccessRate().toFixed(1)}%
                       </span>
                     </div>
                     <div className="w-full bg-slate-700 rounded-full h-2">
                       <div
                         className={`h-2 rounded-full transition-all duration-500 ${
-                          getSuccessRate() === 100 ? "bg-green-500" : "bg-yellow-500"
+                          getSuccessRate() === 100
+                            ? "bg-green-500"
+                            : "bg-yellow-500"
                         }`}
                         style={{ width: `${getSuccessRate()}%` }}
                       ></div>
@@ -542,12 +630,12 @@ export const BugHunter = () => {
                   </div>
 
                   <div className="text-sm text-gray-400 mb-4">
-                    {testResults.filter((test) => test.passed).length} / {testResults.length} tests passing
+                    {testResults.filter((test) => test.passed).length} /{" "}
+                    {testResults.length} tests passing
                   </div>
                 </motion.div>
               )}
 
-              {/* Individual Test Cases */}
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -557,8 +645,8 @@ export const BugHunter = () => {
                 <h3 className="text-lg font-semibold text-white">Test Cases</h3>
 
                 {challenge.testCases.map((testCase, index) => {
-                  const result = testResults[index]
-                  const isExpanded = showTestDetails[index]
+                  const result = testResults[index];
+                  const isExpanded = showTestDetails[index];
 
                   return (
                     <div
@@ -567,8 +655,8 @@ export const BugHunter = () => {
                         result?.passed === true
                           ? "bg-green-900/20 border-green-800/30"
                           : result?.passed === false
-                            ? "bg-red-900/20 border-red-800/30"
-                            : "bg-slate-800/50 border-slate-700"
+                          ? "bg-red-900/20 border-red-800/30"
+                          : "bg-slate-800/50 border-slate-700"
                       }`}
                     >
                       <div
@@ -576,15 +664,25 @@ export const BugHunter = () => {
                         onClick={() => toggleTestDetails(index)}
                       >
                         <div className="flex items-center gap-3">
-                          {result?.passed === true && <CheckCircle className="h-5 w-5 text-green-400" />}
-                          {result?.passed === false && <XCircle className="h-5 w-5 text-red-400" />}
+                          {result?.passed === true && (
+                            <CheckCircle className="h-5 w-5 text-green-400" />
+                          )}
+                          {result?.passed === false && (
+                            <XCircle className="h-5 w-5 text-red-400" />
+                          )}
                           {result?.passed === undefined && (
                             <div className="h-5 w-5 rounded-full border-2 border-gray-400" />
                           )}
-                          <span className="font-medium text-white">{testCase.description}</span>
+                          <span className="font-medium text-white">
+                            {testCase.description}
+                          </span>
                         </div>
                         <button className="text-gray-400 hover:text-white">
-                          {isExpanded ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                          {isExpanded ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
                         </button>
                       </div>
 
@@ -598,7 +696,9 @@ export const BugHunter = () => {
                           >
                             <div>
                               <span className="text-gray-400">Input: </span>
-                              <code className="text-blue-300 bg-slate-900/50 px-2 py-1 rounded">{testCase.input}</code>
+                              <code className="text-blue-300 bg-slate-900/50 px-2 py-1 rounded">
+                                {testCase.input}
+                              </code>
                             </div>
                             <div>
                               <span className="text-gray-400">Expected: </span>
@@ -611,7 +711,9 @@ export const BugHunter = () => {
                                 <span className="text-gray-400">Actual: </span>
                                 <code
                                   className={`px-2 py-1 rounded bg-slate-900/50 ${
-                                    result.passed ? "text-green-300" : "text-red-300"
+                                    result.passed
+                                      ? "text-green-300"
+                                      : "text-red-300"
                                   }`}
                                 >
                                   {result.actual}
@@ -622,7 +724,7 @@ export const BugHunter = () => {
                         )}
                       </AnimatePresence>
                     </div>
-                  )
+                  );
                 })}
               </motion.div>
             </div>
@@ -630,5 +732,5 @@ export const BugHunter = () => {
         )}
       </div>
     </section>
-  )
-}
+  );
+};

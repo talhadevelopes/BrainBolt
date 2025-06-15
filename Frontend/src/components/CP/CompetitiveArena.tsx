@@ -1,15 +1,20 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect } from "react"
-import { Trophy, Sword, Youtube, Loader2, Brain } from "lucide-react"
-import { motion } from "framer-motion"
-import { SolutionSubmission } from "./SolutionSubmission"
-import { Navbar } from "../Navbar"
-import { useCompetitiveArenaStore } from "../../stores/competitiveArenaStore"
+import { useEffect } from "react";
+import { Trophy, Sword, Youtube, Loader2, Brain } from "lucide-react";
+import { motion } from "framer-motion";
+import { SolutionSubmission } from "./SolutionSubmission";
+import { useCompetitiveArenaStore } from "../../stores/competitiveArenaStore";
 
-export const CompetitiveArena = () => {
+interface CompetitiveArenaProps {
+  initialVideoId?: string; // New prop for pre-filling videoId
+}
+
+export const CompetitiveArena: React.FC<CompetitiveArenaProps> = ({
+  initialVideoId,
+}) => {
   const {
     problems,
     currentProblem,
@@ -23,37 +28,38 @@ export const CompetitiveArena = () => {
     setCurrentProblem,
     fetchProblems,
     reset,
-  } = useCompetitiveArenaStore()
+  } = useCompetitiveArenaStore();
 
-  // Initialize with default problem on mount
+  // Initialize with default problem and videoId on mount
   useEffect(() => {
-    // Reset store to ensure clean state
-    reset()
-  }, [reset])
+    reset();
+    if (initialVideoId && initialVideoId.trim()) {
+      setVideoId(initialVideoId);
+    }
+  }, [reset, setVideoId, initialVideoId]);
 
   const handleVideoIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim()
-    setVideoId(value)
-  }
+    const value = e.target.value.trim();
+    setVideoId(value);
+  };
 
   const handleDifficultyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setDifficulty(e.target.value as "easy" | "medium" | "hard")
-  }
+    setDifficulty(e.target.value as "easy" | "medium" | "hard");
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      fetchProblems()
+      fetchProblems();
     }
-  }
+  };
 
   const handleFetchProblems = () => {
-    fetchProblems()
-  }
+    fetchProblems();
+  };
 
   return (
     <section className="relative py-12 overflow-hidden bg-slate-900">
       <div className="container mx-auto px-6">
-        <Navbar title="Competitive Arena" icon={Sword} />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -65,11 +71,15 @@ export const CompetitiveArena = () => {
             <Trophy className="h-12 w-12 text-yellow-400" />
             <span>
               Competitive
-              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text"> Arena</span>
+              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
+                {" "}
+                Arena
+              </span>
             </span>
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Test your skills against challenging problems generated from YouTube videos
+            Test your skills against challenging problems generated from YouTube
+            videos
           </p>
         </motion.div>
 
@@ -82,12 +92,16 @@ export const CompetitiveArena = () => {
         >
           <div className="flex items-center gap-3 mb-4">
             <Youtube className="h-6 w-6 text-red-400" />
-            <h3 className="text-xl font-semibold text-white">Generate Problems from YouTube Video</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Generate Problems from YouTube Video
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-2">YouTube Video ID</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                YouTube Video ID
+              </label>
               <input
                 type="text"
                 value={videoId}
@@ -96,11 +110,15 @@ export const CompetitiveArena = () => {
                 placeholder="Enter YouTube video ID (e.g., dQw4w9WgXcQ)"
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
-              <p className="text-xs text-gray-400 mt-1">Extract the 11-character ID from the YouTube URL</p>
+              <p className="text-xs text-gray-400 mt-1">
+                Extract the 11-character ID from the YouTube URL
+              </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Difficulty Level</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Difficulty Level
+              </label>
               <select
                 value={difficulty}
                 onChange={handleDifficultyChange}
@@ -147,9 +165,15 @@ export const CompetitiveArena = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg"
           >
-            <h3 className="text-blue-300 font-medium mb-2">📝 Transcript Preview</h3>
-            <p className="text-blue-200 text-sm">{transcript.substring(0, 200)}...</p>
-            <p className="text-blue-400 text-xs mt-2">Length: {transcript.length} characters</p>
+            <h3 className="text-blue-300 font-medium mb-2">
+              📝 Transcript Preview
+            </h3>
+            <p className="text-blue-200 text-sm">
+              {transcript.substring(0, 200)}...
+            </p>
+            <p className="text-blue-400 text-xs mt-2">
+              Length: {transcript.length} characters
+            </p>
           </motion.div>
         )}
 
@@ -186,8 +210,14 @@ export const CompetitiveArena = () => {
 
           {/* Problems List */}
           {problems.length > 1 && (
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-              <h3 className="text-xl font-semibold text-white mb-4">Generated Problems ({problems.length})</h3>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-6"
+            >
+              <h3 className="text-xl font-semibold text-white mb-4">
+                Generated Problems ({problems.length})
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {problems.map((problem, index) => (
                   <motion.button
@@ -201,16 +231,20 @@ export const CompetitiveArena = () => {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
-                    <h4 className="font-semibold text-white mb-2">{problem.title}</h4>
-                    <p className="text-sm text-gray-300 line-clamp-2">{problem.description}</p>
+                    <h4 className="font-semibold text-white mb-2">
+                      {problem.title}
+                    </h4>
+                    <p className="text-sm text-gray-300 line-clamp-2">
+                      {problem.description}
+                    </p>
                     <div className="mt-2">
                       <span
                         className={`text-xs px-2 py-1 rounded ${
                           problem.difficulty === "Easy"
                             ? "bg-green-900/30 text-green-400"
                             : problem.difficulty === "Medium"
-                              ? "bg-yellow-900/30 text-yellow-400"
-                              : "bg-red-900/30 text-red-400"
+                            ? "bg-yellow-900/30 text-yellow-400"
+                            : "bg-red-900/30 text-red-400"
                         }`}
                       >
                         {problem.difficulty}
@@ -238,12 +272,23 @@ export const CompetitiveArena = () => {
                   inputDescription: "Input as specified in the problem",
                   outputDescription: "Expected output format",
                   constraints: ["Follow the problem constraints"],
-                  tips: ["Consider edge cases", "Think about time complexity", "Based on video content"],
-                  difficulty: (currentProblem.difficulty?.toLowerCase() as 'medium' | 'easy' | 'hard') || "medium",
+                  tips: [
+                    "Consider edge cases",
+                    "Think about time complexity",
+                    "Based on video content",
+                  ],
+                  difficulty:
+                    (currentProblem.difficulty?.toLowerCase() as
+                      | "medium"
+                      | "easy"
+                      | "hard") || "medium",
                   functionName: "solution",
                   problemType: "generic",
                 }}
-                initialCode={currentProblem.starterCode?.javascript || "function solution() {\n  // Your code here\n}"}
+                initialCode={
+                  currentProblem.starterCode?.javascript ||
+                  "function solution() {\n  // Your code here\n}"
+                }
                 language="javascript"
               />
             </motion.div>
@@ -251,5 +296,5 @@ export const CompetitiveArena = () => {
         </div>
       </div>
     </section>
-  )
-}
+  );
+};

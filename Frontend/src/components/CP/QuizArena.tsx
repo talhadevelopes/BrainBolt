@@ -1,12 +1,25 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useEffect, useState } from "react"
-import { Brain, Youtube, Loader2, Trophy, CheckCircle, XCircle, RotateCcw, Play } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useQuizStore } from "../../stores/quizStore"
+import type React from "react";
+import { useEffect, useState } from "react";
+import {
+  Brain,
+  Youtube,
+  Loader2,
+  Trophy,
+  CheckCircle,
+  XCircle,
+  RotateCcw,
+  Play,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useQuizStore } from "../../stores/quizStore";
 
-export const QuizArena = () => {
+interface QuizArenaProps {
+  initialVideoId?: string; // New prop for pre-filling videoId
+}
+
+export const QuizArena: React.FC<QuizArenaProps> = ({ initialVideoId }) => {
   const {
     questions,
     currentTab,
@@ -26,101 +39,118 @@ export const QuizArena = () => {
     startQuestion,
     resetQuiz,
     reset,
-  } = useQuizStore()
+  } = useQuizStore();
 
-  const [selectedAnswers, setSelectedAnswers] = useState<{ [key: string]: number }>({})
-  const [showExplanation, setShowExplanation] = useState<{ [key: string]: boolean }>({})
+  const [selectedAnswers, setSelectedAnswers] = useState<{
+    [key: string]: number;
+  }>({});
+  const [showExplanation, setShowExplanation] = useState<{
+    [key: string]: boolean;
+  }>({});
 
-  // Initialize on mount
+  // Initialize videoId from prop and reset on mount
   useEffect(() => {
-    reset()
-  }, [reset])
+    reset();
+    if (initialVideoId && initialVideoId.trim()) {
+      setVideoId(initialVideoId);
+    }
+  }, [reset, setVideoId, initialVideoId]);
 
   const handleVideoIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.trim()
-    setVideoId(value)
-  }
+    const value = e.target.value.trim();
+    setVideoId(value);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") {
-      generateQuizzes()
+      generateQuizzes();
     }
-  }
+  };
 
   const handleGenerateQuizzes = () => {
-    generateQuizzes()
+    generateQuizzes();
     if (!quizStartTime) {
-      startQuiz()
+      startQuiz();
     }
-  }
+  };
 
-  const handleAnswerSelect = (difficulty: "easy" | "medium" | "hard", questionIndex: number, answerIndex: number) => {
-    const key = `${difficulty}-${questionIndex}`
-    setSelectedAnswers((prev) => ({ ...prev, [key]: answerIndex }))
+  const handleAnswerSelect = (
+    difficulty: "easy" | "medium" | "hard",
+    questionIndex: number,
+    answerIndex: number
+  ) => {
+    const key = `${difficulty}-${questionIndex}`;
+    setSelectedAnswers((prev) => ({ ...prev, [key]: answerIndex }));
 
-    startQuestion()
-    answerQuestion(difficulty, questionIndex, answerIndex)
+    startQuestion();
+    answerQuestion(difficulty, questionIndex, answerIndex);
 
     // Show explanation after answering
     setTimeout(() => {
-      setShowExplanation((prev) => ({ ...prev, [key]: true }))
-    }, 500)
-  }
+      setShowExplanation((prev) => ({ ...prev, [key]: true }));
+    }, 500);
+  };
 
   const handleNextQuestion = (difficulty: "easy" | "medium" | "hard") => {
-    const currentIndex = currentQuestionIndex[difficulty]
-    const maxIndex = questions[difficulty].length - 1
+    const currentIndex = currentQuestionIndex[difficulty];
+    const maxIndex = questions[difficulty].length - 1;
 
     if (currentIndex < maxIndex) {
-      setCurrentQuestionIndex(difficulty, currentIndex + 1)
+      setCurrentQuestionIndex(difficulty, currentIndex + 1);
     }
-  }
+  };
 
   const handlePrevQuestion = (difficulty: "easy" | "medium" | "hard") => {
-    const currentIndex = currentQuestionIndex[difficulty]
+    const currentIndex = currentQuestionIndex[difficulty];
 
     if (currentIndex > 0) {
-      setCurrentQuestionIndex(difficulty, currentIndex - 1)
+      setCurrentQuestionIndex(difficulty, currentIndex - 1);
     }
-  }
+  };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "easy":
-        return "text-green-400 bg-green-900/20 border-green-800/30"
+        return "text-green-400 bg-green-900/20 border-green-800/30";
       case "medium":
-        return "text-yellow-400 bg-yellow-900/20 border-yellow-800/30"
+        return "text-yellow-400 bg-yellow-900/20 border-yellow-800/30";
       case "hard":
-        return "text-red-400 bg-red-900/20 border-red-800/30"
+        return "text-red-400 bg-red-900/20 border-red-800/30";
       default:
-        return "text-gray-400 bg-gray-900/20 border-gray-800/30"
+        return "text-gray-400 bg-gray-900/20 border-gray-800/30";
     }
-  }
+  };
 
   const getTabCount = (difficulty: "easy" | "medium" | "hard") => {
-    const total = questions[difficulty].length
-    const answered = questions[difficulty].filter((q) => q.userAnswer !== undefined).length
-    return `${answered}/${total}`
-  }
+    const total = questions[difficulty].length;
+    const answered = questions[difficulty].filter(
+      (q) => q.userAnswer !== undefined
+    ).length;
+    return `${answered}/${total}`;
+  };
 
   const renderQuestion = (difficulty: "easy" | "medium" | "hard") => {
-    const currentIndex = currentQuestionIndex[difficulty]
-    const question = questions[difficulty][currentIndex]
+    const currentIndex = currentQuestionIndex[difficulty];
+    const question = questions[difficulty][currentIndex];
 
     if (!question) {
       return (
         <div className="text-center py-12">
           <Brain className="h-16 w-16 mx-auto text-gray-400 mb-4" />
-          <p className="text-gray-400 text-lg">No questions available for {difficulty} difficulty</p>
-          <p className="text-gray-500 text-sm mt-2">Generate quizzes from a YouTube video to get started</p>
+          <p className="text-gray-400 text-lg">
+            No questions available for {difficulty} difficulty
+          </p>
+          <p className="text-gray-500 text-sm mt-2">
+            Generate quizzes from a YouTube video to get started
+          </p>
         </div>
-      )
+      );
     }
 
-    const key = `${difficulty}-${currentIndex}`
-    const selectedAnswer = selectedAnswers[key]
-    const showExp = showExplanation[key]
-    const isAnswered = question.userAnswer !== undefined
+    const key = `${difficulty}-${currentIndex}`;
+    const selectedAnswer = selectedAnswers[key];
+    const showExp = showExplanation[key];
+    const isAnswered = question.userAnswer !== undefined;
 
     return (
       <motion.div
@@ -136,48 +166,63 @@ export const QuizArena = () => {
             <span className="text-sm font-medium text-gray-400">
               Question {currentIndex + 1} of {questions[difficulty].length}
             </span>
-            <span className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(difficulty)}`}>
+            <span
+              className={`px-2 py-1 rounded text-xs font-medium ${getDifficultyColor(
+                difficulty
+              )}`}
+            >
               {difficulty.toUpperCase()}
             </span>
           </div>
 
           {question.topic && (
-            <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">{question.topic}</span>
+            <span className="text-xs text-gray-500 bg-gray-800/50 px-2 py-1 rounded">
+              {question.topic}
+            </span>
           )}
         </div>
 
         {/* Question */}
         <div className="p-6 bg-slate-800/50 border border-slate-700 rounded-lg">
-          <h3 className="text-xl font-semibold text-white mb-6">{question.question}</h3>
+          <h3 className="text-xl font-semibold text-white mb-6">
+            {question.question}
+          </h3>
 
           {/* Options */}
           <div className="space-y-3">
             {question.options.map((option, index) => {
-              const isSelected = selectedAnswer === index
-              const isCorrect = index === question.correctAnswer
-              const showResult = isAnswered && showExp
+              const isSelected = selectedAnswer === index;
+              const isCorrect = index === question.correctAnswer;
+              const showResult = isAnswered && showExp;
 
-              let optionClass = "p-4 border rounded-lg cursor-pointer transition-all duration-200 "
+              let optionClass =
+                "p-4 border rounded-lg cursor-pointer transition-all duration-200 ";
 
               if (showResult) {
                 if (isCorrect) {
-                  optionClass += "bg-green-900/20 border-green-800/30 text-green-300"
+                  optionClass +=
+                    "bg-green-900/20 border-green-800/30 text-green-300";
                 } else if (isSelected && !isCorrect) {
-                  optionClass += "bg-red-900/20 border-red-800/30 text-red-300"
+                  optionClass += "bg-red-900/20 border-red-800/30 text-red-300";
                 } else {
-                  optionClass += "bg-slate-800/30 border-slate-700 text-gray-400"
+                  optionClass +=
+                    "bg-slate-800/30 border-slate-700 text-gray-400";
                 }
               } else if (isSelected) {
-                optionClass += "bg-indigo-900/30 border-indigo-700 text-indigo-300"
+                optionClass +=
+                  "bg-indigo-900/30 border-indigo-700 text-indigo-300";
               } else {
                 optionClass +=
-                  "bg-slate-800/30 border-slate-700 text-gray-300 hover:bg-slate-700/50 hover:border-slate-600"
+                  "bg-slate-800/30 border-slate-700 text-gray-300 hover:bg-slate-700/50 hover:border-slate-600";
               }
 
               return (
                 <motion.button
                   key={index}
-                  onClick={() => !isAnswered && handleAnswerSelect(difficulty, currentIndex, index)}
+                  onClick={() =>
+                    !isAnswered &&
+                    handleAnswerSelect(difficulty, currentIndex, index)
+                  }
                   disabled={isAnswered}
                   className={optionClass}
                   whileHover={!isAnswered ? { scale: 1.01 } : {}}
@@ -193,13 +238,17 @@ export const QuizArena = () => {
 
                     {showResult && (
                       <div>
-                        {isCorrect && <CheckCircle className="h-5 w-5 text-green-400" />}
-                        {isSelected && !isCorrect && <XCircle className="h-5 w-5 text-red-400" />}
+                        {isCorrect && (
+                          <CheckCircle className="h-5 w-5 text-green-400" />
+                        )}
+                        {isSelected && !isCorrect && (
+                          <XCircle className="h-5 w-5 text-red-400" />
+                        )}
                       </div>
                     )}
                   </div>
                 </motion.button>
-              )
+              );
             })}
           </div>
         </div>
@@ -218,8 +267,12 @@ export const QuizArena = () => {
                   <Brain className="h-4 w-4 text-blue-400" />
                 </div>
                 <div>
-                  <h4 className="text-blue-300 font-medium mb-1">Explanation</h4>
-                  <p className="text-blue-200 text-sm">{question.explanation}</p>
+                  <h4 className="text-blue-300 font-medium mb-1">
+                    Explanation
+                  </h4>
+                  <p className="text-blue-200 text-sm">
+                    {question.explanation}
+                  </p>
                 </div>
               </div>
             </motion.div>
@@ -238,7 +291,11 @@ export const QuizArena = () => {
 
           <div className="text-sm text-gray-400">
             {isAnswered ? (
-              <span className={question.isCorrect ? "text-green-400" : "text-red-400"}>
+              <span
+                className={
+                  question.isCorrect ? "text-green-400" : "text-red-400"
+                }
+              >
                 {question.isCorrect ? "Correct!" : "Incorrect"}
               </span>
             ) : (
@@ -255,8 +312,8 @@ export const QuizArena = () => {
           </button>
         </div>
       </motion.div>
-    )
-  }
+    );
+  };
 
   return (
     <section className="relative py-12 overflow-hidden bg-slate-900">
@@ -272,7 +329,10 @@ export const QuizArena = () => {
             <Brain className="h-12 w-12 text-purple-400" />
             <span>
               Quiz
-              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text"> Arena</span>
+              <span className="bg-gradient-to-r from-purple-400 to-pink-600 text-transparent bg-clip-text">
+                {" "}
+                Arena
+              </span>
             </span>
           </h2>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -289,12 +349,16 @@ export const QuizArena = () => {
         >
           <div className="flex items-center gap-3 mb-4">
             <Youtube className="h-6 w-6 text-red-400" />
-            <h3 className="text-xl font-semibold text-white">Generate Quizzes from YouTube Video</h3>
+            <h3 className="text-xl font-semibold text-white">
+              Generate Quizzes from YouTube Video
+            </h3>
           </div>
 
           <div className="flex gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-300 mb-2">YouTube Video ID</label>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                YouTube Video ID
+              </label>
               <input
                 type="text"
                 value={videoId}
@@ -304,7 +368,8 @@ export const QuizArena = () => {
                 className="w-full px-4 py-3 bg-slate-800/50 border border-slate-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
               <p className="text-xs text-gray-400 mt-1">
-                This will generate 5 questions each for Easy, Medium, and Hard difficulty
+                This will generate 5 questions each for Easy, Medium, and Hard
+                difficulty
               </p>
             </div>
 
@@ -343,9 +408,15 @@ export const QuizArena = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-6 p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg"
           >
-            <h3 className="text-blue-300 font-medium mb-2">📝 Transcript Preview</h3>
-            <p className="text-blue-200 text-sm">{transcript.substring(0, 200)}...</p>
-            <p className="text-blue-400 text-xs mt-2">Length: {transcript.length} characters</p>
+            <h3 className="text-blue-300 font-medium mb-2">
+              📝 Transcript Preview
+            </h3>
+            <p className="text-blue-200 text-sm">
+              {transcript.substring(0, 200)}...
+            </p>
+            <p className="text-blue-400 text-xs mt-2">
+              Length: {transcript.length} characters
+            </p>
           </motion.div>
         )}
 
@@ -403,23 +474,33 @@ export const QuizArena = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-white">{stats.answeredQuestions}</div>
+                <div className="text-2xl font-bold text-white">
+                  {stats.answeredQuestions}
+                </div>
                 <div className="text-xs text-gray-400">Answered</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-green-400">{stats.correctAnswers}</div>
+                <div className="text-2xl font-bold text-green-400">
+                  {stats.correctAnswers}
+                </div>
                 <div className="text-xs text-gray-400">Correct</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-blue-400">{stats.accuracy.toFixed(1)}%</div>
+                <div className="text-2xl font-bold text-blue-400">
+                  {stats.accuracy.toFixed(1)}%
+                </div>
                 <div className="text-xs text-gray-400">Accuracy</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-purple-400">{stats.averageTime.toFixed(1)}s</div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {stats.averageTime.toFixed(1)}s
+                </div>
                 <div className="text-xs text-gray-400">Avg Time</div>
               </div>
               <div className="p-3 bg-slate-800/50 rounded-lg text-center">
-                <div className="text-2xl font-bold text-yellow-400">{stats.totalQuestions}</div>
+                <div className="text-2xl font-bold text-yellow-400">
+                  {stats.totalQuestions}
+                </div>
                 <div className="text-xs text-gray-400">Total</div>
               </div>
             </div>
@@ -437,14 +518,19 @@ export const QuizArena = () => {
                   onClick={() => setCurrentTab(difficulty)}
                   className={`flex-1 px-6 py-4 text-sm font-medium transition-all duration-200 ${
                     currentTab === difficulty
-                      ? getDifficultyColor(difficulty).replace("bg-", "bg-").replace("/20", "/30") +
-                        " border-b-2 border-current"
+                      ? getDifficultyColor(difficulty)
+                          .replace("bg-", "bg-")
+                          .replace("/20", "/30") + " border-b-2 border-current"
                       : "text-gray-400 hover:text-gray-300 hover:bg-slate-700/50"
                   }`}
                 >
                   <div className="flex items-center justify-center gap-2">
-                    <span>{difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
-                    <span className="text-xs opacity-70">({getTabCount(difficulty)})</span>
+                    <span>
+                      {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
+                    </span>
+                    <span className="text-xs opacity-70">
+                      ({getTabCount(difficulty)})
+                    </span>
                   </div>
                 </button>
               ))}
@@ -453,10 +539,12 @@ export const QuizArena = () => {
 
           {/* Tab Content */}
           <div className="p-8">
-            <AnimatePresence mode="wait">{renderQuestion(currentTab)}</AnimatePresence>
+            <AnimatePresence mode="wait">
+              {renderQuestion(currentTab)}
+            </AnimatePresence>
           </div>
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
