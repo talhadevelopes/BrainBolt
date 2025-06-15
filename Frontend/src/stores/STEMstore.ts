@@ -111,6 +111,7 @@ export const useSteamStore = create<SteamState>((set, get) => ({
         topic,
         timestamp,
         content: {},
+        title: ""
       });
       moduleCount++;
     };

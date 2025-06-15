@@ -3,7 +3,7 @@
 import type React from "react";
 
 import { useEffect } from "react";
-import { Trophy, Sword, Youtube, Loader2, Brain } from "lucide-react";
+import { Trophy, Youtube, Loader2, Brain } from "lucide-react";
 import { motion } from "framer-motion";
 import { SolutionSubmission } from "./SolutionSubmission";
 import { useCompetitiveArenaStore } from "../../stores/competitiveArenaStore";

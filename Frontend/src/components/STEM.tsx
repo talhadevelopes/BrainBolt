@@ -6,13 +6,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSteamStore } from "../stores/STEMstore";
 import ModuleStem from "../components/STEM/ModuleSTEM";
 import { QuizArena } from "../components/CP/QuizArena"; // Adjust path as needed
-import { ModuleData } from "./Linear/Data/moduleData";
-import { useNavigate } from "react-router-dom";
+// import { ModuleData } from "./Linear/Data/moduleData";
 import { CompetitiveArena } from "./CP/CompetitiveArena";
 import { BugHunter } from "./CP/BugHunterArena";
 
 export function STEM() {
-  const navigate = useNavigate();
   const {
     videoId,
     transcript,
@@ -170,7 +168,15 @@ export function STEM() {
     }
   };
 
-  const handleModuleClick = (module: ModuleData) => {
+  const handleModuleClick = (module: {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timestamp: number;
+    topic: string;
+    icon?: any;
+  }) => {
     if (playerInstance) {
       console.log("Seeking to module timestamp:", module.timestamp);
       playerInstance.seekTo(module.timestamp);

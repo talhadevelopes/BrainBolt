@@ -1,10 +1,17 @@
 import React from "react";
 import { useSteamStore } from "../../stores/STEMstore";
 import { motion } from "framer-motion";
-import type { ModuleData } from "../../components/Linear/Data/moduleData";
 
 interface ModuleStemProps {
-  onModuleClick: (module: ModuleData) => void;
+  onModuleClick: (module: {
+    id: string;
+    type: string;
+    title: string;
+    description: string;
+    timestamp: number;
+    topic: string;
+    icon?: any;
+  }) => void;
   onTestModule: () => void;
 }
 
