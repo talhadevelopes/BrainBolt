@@ -302,7 +302,7 @@ export const Hero = () => {
           {/* Feature showcase - minimal cards with hexagonal accents */}
           <motion.div
             variants={containerVariants}
-            className="grid grid-cols-1 md:grid-cols-3 gap-1 max-w-5xl mx-auto mb-12"
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12"
           >
             {[
               {
