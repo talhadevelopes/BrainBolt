@@ -6,6 +6,7 @@ export type ModuleType =
   | 'Numerical Navigator';
 
 export interface ModuleData {
+  subject: ReactNode;
   timestamp(timestamp: any): unknown;
   id: string;
   type: ModuleType;
