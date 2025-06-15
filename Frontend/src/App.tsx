@@ -39,7 +39,18 @@ const App: React.FC = () => {
           <Route path="/stem" element={<STEM />} />
           <Route path="/Test" element={<Layout />} />
         </Routes>
-        <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer 
+          position="top-right" 
+          autoClose={3000} 
+          theme="dark"
+          toastStyle={{
+            background: "rgba(20, 20, 20, 0.9)",
+            color: "#fff",
+            borderRadius: "12px",
+            boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+            padding: "12px 16px"
+          }}
+        />
       </div>
     </Router>
   );

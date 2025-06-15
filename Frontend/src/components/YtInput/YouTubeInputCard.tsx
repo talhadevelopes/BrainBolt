@@ -72,6 +72,14 @@ const trackOptions = [
   },
 ];
 
+const customToastStyle = {
+  background: 'rgba(20, 20, 20, 0.9)',
+  color: '#fff',
+  borderRadius: '12px',
+  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.3)',
+  padding: '12px 16px',
+};
+
 export const YouTubeLearningPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -391,7 +399,7 @@ export const YouTubeLearningPortal = () => {
 
   return (
     <div className="min-h-screen bg-black text-white relative overflow-hidden">
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         autoClose={3000}
         hideProgressBar
@@ -402,7 +410,7 @@ export const YouTubeLearningPortal = () => {
         draggable
         pauseOnHover
         className="mt-4 mr-4"
-      />
+      /> */}
       <motion.div
         animate={{
           opacity: [0.04, 0.06, 0.04],
