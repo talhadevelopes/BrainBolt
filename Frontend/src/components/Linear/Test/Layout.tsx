@@ -460,7 +460,8 @@ export const Layout: React.FC = () => {
           <div className="w-full h-full bg-gradient-to-br from-white/5 to-transparent rounded-full blur-3xl transform rotate-45" />
         </motion.div>
 
-        <div className="container mx-auto px-6 py-8 relative z-10 max-w-7xl">
+       <div className="container mx-auto px-5 py-8 relative z-10 max-w-7xl">
+
           <motion.div variants={containerVariants} initial="hidden" animate="visible">
             {/* Header */}
             <motion.div variants={itemVariants} className="text-center mb-12">
@@ -589,7 +590,7 @@ export const Layout: React.FC = () => {
               {!isPlayerExpanded && (
                 <motion.div variants={itemVariants} className="xl:col-span-1 space-y-6">
                   {/* Learning Statistics */}
-                  <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
+                  <div className="w-full max-w-[440px] min-w-[320px] space-y-6 p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-xl font-light text-white">Learning Stats</h3>
                       <div className="flex gap-2">
@@ -616,6 +617,7 @@ export const Layout: React.FC = () => {
                         </button>
                       </div>
                     </div>
+
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -649,7 +651,7 @@ export const Layout: React.FC = () => {
                   </div>
 
                   {/* Module Search and List */}
-                  <div className="p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
+                   <div className="w-full max-w-[440px] min-w-[320px] space-y-6 p-6 rounded-3xl bg-white/[0.02] backdrop-blur-sm border border-white/[0.05]">
                     <h3 className="text-xl font-light text-white mb-4">Learning Modules</h3>
 
                     <div className="relative mb-4">

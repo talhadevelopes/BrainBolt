@@ -69,9 +69,9 @@ export function StatsCard({
   recommendedQuizzes,
 }: StatsCardProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
       {/* Quick Stats */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Quick Stats</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-700/50 p-4 rounded-lg">
@@ -106,7 +106,7 @@ export function StatsCard({
       </div>
 
       {/* Category Progress */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Category Progress</h3>
         <div className="space-y-4">
           {categoryStats.map((category, index) => {
@@ -136,7 +136,7 @@ export function StatsCard({
       </div>
 
       {/* Topic Progress Chart */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Topic Progress</h3>
         <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -160,7 +160,7 @@ export function StatsCard({
       </div>
 
       {/* Global Leaderboard */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Global Leaderboard</h3>
         <div className="space-y-3">
           {leaderboardData.map((player, index) => (
@@ -197,7 +197,7 @@ export function StatsCard({
       </div>
 
       {/* XP Progress Chart */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">XP Progress</h3>
         <div className="h-[200px]">
           <ResponsiveContainer width="100%" height="100%">
@@ -232,7 +232,7 @@ export function StatsCard({
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Recent Activity</h3>
         <div className="space-y-4">
           {recentActivities.map((activity, index) => (
@@ -252,7 +252,7 @@ export function StatsCard({
       </div>
 
       {/* Recommended Quizzes */}
-      <div className="bg-gray-800 rounded-xl p-6 shadow-lg">
+      <div className="bg-gray-800 rounded-xl p-6 shadow-lg" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
         <h3 className="text-xl font-semibold text-white mb-4">Recommended Quizzes</h3>
         <div className="space-y-3">
           {recommendedQuizzes.map((quiz, index) => (
