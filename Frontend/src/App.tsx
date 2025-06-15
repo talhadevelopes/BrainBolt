@@ -13,7 +13,7 @@ import { Dashboard } from "./components/Dashboard/Dashboard";
 import { TheoryContent } from "./components/Content/TheoryContent";
 // import { Layout } from 'lucide-react';
 import { Layout } from "./components/Linear/Test/Layout";
-import { Pcm } from "./components/PCM";
+// import { Pcm } from "./components/PCM";
 import { STEM } from "./components/STEM";
 import { QuizArena } from "./components/CP/QuizArena";
 import { BugHunter } from "./components/CP/BugHunterArena";
@@ -35,7 +35,7 @@ const App: React.FC = () => {
           <Route path="/kc" element={<MainQuiz />} />
           <Route path="/rh" element={<MainResources />} />
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/pcm" element={<Pcm />} />
+          <Route path="/pcm" element={<Layout />} />
           <Route path="/stem" element={<STEM />} />
           <Route path="/Test" element={<Layout />} />
         </Routes>
