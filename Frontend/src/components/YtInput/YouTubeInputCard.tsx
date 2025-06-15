@@ -510,7 +510,7 @@ export const YouTubeLearningPortal = () => {
                 variants={itemVariants}
                 className="text-4xl lg:text-6xl font-light text-white mb-4 tracking-tight leading-[0.9]"
               >
-                YouTube
+                NextGen
               </motion.h1>
               <motion.h1
                 variants={itemVariants}
