@@ -1,16 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { YouTubePlayer } from "../components/STEM/YoutubePlayer";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSteamStore } from "../stores/STEMstore";
 import ModuleStem from "../components/STEM/ModuleSTEM";
 
-import { useNavigate } from "react-router-dom";
 import { ModuleData } from "./Linear/Data/moduleData";
 
 export function STEM() {
-  const navigate = useNavigate();
   const {
     videoId,
     transcript,

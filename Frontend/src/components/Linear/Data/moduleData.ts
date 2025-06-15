@@ -94,7 +94,7 @@ export const moduleData: ModuleData[] = [
         accuracy: 84
       }
     },
-    timestamp: function (timestamp: any): unknown {
+    timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
     }
   },
@@ -197,7 +197,7 @@ export const moduleData: ModuleData[] = [
         { name: 'Thermodynamics', derivationCount: 7 }
       ]
     },
-    timestamp: function (timestamp: any): unknown {
+    timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
     }
   },
@@ -284,7 +284,7 @@ export const moduleData: ModuleData[] = [
         { name: 'Orbital View', icon: '🪐', description: 'Show electron orbitals' }
       ]
     },
-    timestamp: function (timestamp: any): unknown {
+    timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
     }
   },
@@ -362,7 +362,7 @@ export const moduleData: ModuleData[] = [
         { name: 'Combinatorial', examples: 19 }
       ]
     },
-    timestamp: function (timestamp: any): unknown {
+    timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
     }
   },
@@ -498,7 +498,7 @@ export const moduleData: ModuleData[] = [
         { name: 'Chemical Engineering', problemCount: 19 }
       ]
     },
-    timestamp: function (timestamp: any): unknown {
+    timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
     }
   }
