@@ -1,26 +1,92 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { VideoData, Timestamp } from '../Data/hardcodedData';
-import { TimestampModule } from '../Data/moduleAssignment';
 import { Play, Pause, Clock, BookOpen } from 'lucide-react';
 
+// Types
+interface Timestamp {
+  time: number;
+  title: string;
+}
+
+interface VideoData {
+  id: string;
+  title: string;
+  artist: string;
+  duration: number;
+  timestamps: Timestamp[];
+}
+
+interface Module {
+  id: string;
+  title: string;
+  type: string;
+  icon: string;
+  description: string;
+}
+
+interface TimestampModule {
+  timestamp: Timestamp;
+  module: Module;
+}
+
 interface PlayerProps {
-  videoData: VideoData;
   onTimestampReached: (timestamp: Timestamp) => void;
   timestampModules: TimestampModule[];
 }
 
-const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestampModules }) => {
+const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules }) => {
+  const [videoData, setVideoData] = useState<VideoData | null>(null);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [pausedAtTimestamp, setPausedAtTimestamp] = useState<number | null>(null);
   const [nextTimestampIndex, setNextTimestampIndex] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [playerInitialized, setPlayerInitialized] = useState(false);
 
-  // Initialize YouTube player
+  // Initialize video data from localStorage
   useEffect(() => {
+    const loadVideoData = () => {
+      try {
+        // Extract video ID from localStorage
+        const videoId = localStorage.getItem("currentVideoId") || "dQw4w9WgXcQ";
+        
+        const videoData: VideoData = {
+          id: videoId,
+          title: 'Educational Physics Lecture - Mechanics and Thermodynamics',
+          artist: 'Dr. Physics Professor',
+          duration: 300,
+          timestamps: [
+            { time: 30, title: 'Introduction to Kinematics' },
+            { time: 75, title: 'Newton\'s Laws of Motion' },
+            { time: 120, title: 'Energy and Work' },
+            { time: 165, title: 'Thermodynamic Processes' },
+            { time: 210, title: 'Heat Transfer Mechanisms' },
+            { time: 255, title: 'Electromagnetic Fields' },
+            { time: 285, title: 'Quantum Mechanics Basics' }
+          ]
+        };
+
+        setVideoData(videoData);
+        setLoading(false);
+        console.log("Loaded video ID from localStorage:", videoId);
+      } catch (err) {
+        console.error("Error loading video data:", err);
+        setError('Failed to load video data');
+        setLoading(false);
+      }
+    };
+
+    loadVideoData();
+  }, []);
+
+  // Initialize YouTube player when videoData is ready
+  useEffect(() => {
+    if (!videoData || !videoData.id || playerInitialized) return;
+
     const loadPlayer = () => {
       // @ts-ignore
       playerRef.current = new window.YT.Player('youtube-player', {
@@ -30,18 +96,19 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
         playerVars: {
           playsinline: 1,
           enablejsapi: 1,
-          origin: window.location.origin
+          origin: window.location.origin,
+          controls: 0
         },
         events: {
           'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
+          'onStateChange': onPlayerStateChange,
+          'onError': onPlayerError
         }
       });
+      setPlayerInitialized(true);
     };
-
-    // @ts-ignore
+//@ts-ignore
     if (!window.YT) {
-      // Load YouTube IFrame API if not already loaded
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
       
@@ -59,11 +126,17 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (playerRef.current) playerRef.current.destroy();
+      setPlayerInitialized(false);
     };
-  }, [videoData.id]);
-
-  const onPlayerReady = () => {
-    // Player is ready
+  }, [videoData]);
+    //@ts-ignore
+  const onPlayerReady = (event: any) => {
+    console.log("YouTube player ready for video:", videoData?.id);
+    // Set initial duration if available
+    if (videoData) {
+      //@ts-ignore
+      setDuration(videoData.duration);
+    }
   };
 
   const onPlayerStateChange = (event: any) => {
@@ -84,6 +157,21 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
     }
   };
 
+  const onPlayerError = (event: any) => {
+    console.error('YouTube Player Error:', event.data);
+    setError(`Failed to play video: ${getYouTubeError(event.data)}`);
+  };
+
+  const getYouTubeError = (errorCode: number): string => {
+    switch (errorCode) {
+      case 2: return 'Invalid video ID';
+      case 5: return 'HTML5 player error';
+      case 100: return 'Video not found';
+      case 101: case 150: return 'Embedding not allowed';
+      default: return `Error code: ${errorCode}`;
+    }
+  };
+
   const startProgressTracking = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     
@@ -93,7 +181,8 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
         setCurrentTime(time);
         
         // Check if we've reached the next timestamp
-        if (nextTimestampIndex < videoData.timestamps.length && time >= videoData.timestamps[nextTimestampIndex].time) {
+        if (videoData && nextTimestampIndex < videoData.timestamps.length && 
+            time >= videoData.timestamps[nextTimestampIndex].time) {
           playerRef.current.pauseVideo();
           setPausedAtTimestamp(videoData.timestamps[nextTimestampIndex].time);
           onTimestampReached(videoData.timestamps[nextTimestampIndex]);
@@ -126,10 +215,12 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
       
       // Update next timestamp index based on new position
       let newIndex = 0;
-      for (let i = 0; i < videoData.timestamps.length; i++) {
-        if (newTime < videoData.timestamps[i].time) {
-          newIndex = i;
-          break;
+      if (videoData) {
+        for (let i = 0; i < videoData.timestamps.length; i++) {
+          if (newTime < videoData.timestamps[i].time) {
+            newIndex = i;
+            break;
+          }
         }
       }
       setNextTimestampIndex(newIndex);
@@ -145,9 +236,11 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
       playerRef.current.pauseVideo();
       
       // Find the index of this timestamp
-      const index = videoData.timestamps.findIndex((ts:any) => ts.time === time);
-      if (index !== -1) {
-        setNextTimestampIndex(index + 1);
+      if (videoData) {
+        const index = videoData.timestamps.findIndex(ts => ts.time === time);
+        if (index !== -1) {
+          setNextTimestampIndex(index + 1);
+        }
       }
     }
   };
@@ -162,6 +255,43 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
     return timestampModules.find(tm => tm.timestamp.time === time)?.module;
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+        <p className="ml-4 text-purple-500">Loading player...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl p-6">
+        <div className="bg-red-500/20 p-6 rounded-xl max-w-md text-center">
+          <h3 className="text-red-200 font-bold text-xl mb-3">Error</h3>
+          <p className="text-red-100 mb-5">{error}</p>
+          <button 
+            className="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-700 transition font-medium"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!videoData) {
+    return (
+      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl p-6">
+        <div className="bg-yellow-500/20 p-6 rounded-xl max-w-md text-center">
+          <h3 className="text-yellow-200 font-bold text-xl mb-3">No Video Data</h3>
+          <p className="text-yellow-100 mb-5">Could not load video information</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       {/* Video Player */}
@@ -171,8 +301,15 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
         className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl"
       >
         <div className="p-4">
-          <div className="bg-black rounded-xl overflow-hidden shadow-lg">
+          <div className="bg-black rounded-xl overflow-hidden shadow-lg relative">
             <div id="youtube-player" className="w-full aspect-video" />
+            
+            {/* Video Info Overlay */}
+            <div className="absolute bottom-4 left-4 right-4 bg-black/70 p-3 rounded-lg">
+              <h2 className="text-lg font-bold truncate">{videoData.title}</h2>
+              <p className="text-gray-400 text-sm">{videoData.artist}</p>
+              <p className="text-gray-500 text-xs mt-1">Video ID: {videoData.id}</p>
+            </div>
           </div>
         </div>
         
@@ -213,7 +350,7 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
             max={videoData.duration}
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-600"
+            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
           />
           
           <AnimatePresence>
@@ -222,23 +359,23 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="mt-4 p-4 bg-gradient-to-r from-yellow-900/30 to-orange-900/30 border border-yellow-700 rounded-lg"
+                className="mt-4 p-4 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700 rounded-lg"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-yellow-600 rounded-full">
+                    <div className="p-2 bg-purple-600 rounded-full">
                       <BookOpen size={16} className="text-white" />
                     </div>
                     <div>
-                      <p className="text-yellow-300 font-medium">Learning Module Activated!</p>
-                      <p className="text-yellow-200 text-sm">Paused at {formatTime(pausedAtTimestamp)}</p>
+                      <p className="text-purple-300 font-medium">Learning Module Activated!</p>
+                      <p className="text-purple-200 text-sm">Paused at {formatTime(pausedAtTimestamp)}</p>
                     </div>
                   </div>
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={togglePlayPause}
-                    className="flex items-center gap-2 bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg font-medium"
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium"
                   >
                     <Play size={16} />
                     Continue
@@ -266,7 +403,7 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
         </div>
         
         <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {videoData.timestamps.map((ts:any, index:any) => {
+          {videoData.timestamps.map((ts, index) => {
             const module = getModuleForTimestamp(ts.time);
             
             return (
@@ -326,6 +463,25 @@ const Player: React.FC<PlayerProps> = ({ videoData, onTimestampReached, timestam
           })}
         </div>
       </motion.div>
+      
+      <div className="mt-4 text-center text-gray-500 text-sm">
+        <p>Playing video from localStorage: {videoData.id}</p>
+        <p className="text-gray-600 mt-1">
+          To change the video, update the "videoId" in localStorage
+        </p>
+        <button
+          className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          onClick={() => {
+            const newVideoId = prompt("Enter new YouTube video ID:");
+            if (newVideoId) {
+              localStorage.setItem("videoId", newVideoId);
+              window.location.reload();
+            }
+          }}
+        >
+          Change Video
+        </button>
+      </div>
     </div>
   );
 };

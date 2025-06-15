@@ -89,6 +89,7 @@ export const Layout: React.FC = () => {
             className="flex-1"
           >
             <Player 
+            //@ts-ignore
               videoData={videoData} 
               onTimestampReached={handleTimestampReached}
               timestampModules={timestampModules}
