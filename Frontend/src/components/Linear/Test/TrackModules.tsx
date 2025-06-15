@@ -170,12 +170,12 @@ const TrackModules: React.FC<TrackModulesProps> = ({ timestampModules }) => {
       variants={containerVariants}
       initial="hidden"
       animate="visible"
-      className="space-y-6"
+      className="w-full max-w-[440px] min-w-[320px] space-y-6"
     >
       {/* Enhanced Tab Navigation */}
       <motion.div 
         variants={itemVariants}
-        className="bg-white/[0.02] backdrop-blur-sm rounded-3xl overflow-hidden border border-white/[0.05] shadow-2xl"
+        className="w-full max-w-[440px] min-w-[320px] bg-white/[0.02] backdrop-blur-sm rounded-3xl overflow-hidden border border-white/[0.05] shadow-2xl"
       >
         <div className="flex border-b border-white/[0.05]">
           {tabs.map((tab) => (
@@ -198,7 +198,7 @@ const TrackModules: React.FC<TrackModulesProps> = ({ timestampModules }) => {
           ))}
         </div>
 
-        <div className="p-6 max-h-[calc(100vh-200px)] overflow-y-auto">
+        <div className="p-4 max-h-[calc(100vh-200px)] overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent" style={{ paddingLeft: 4, paddingRight: 4 }}>
           <AnimatePresence mode="wait">
             {activeTab === 'modules' && (
               <motion.div
@@ -250,12 +250,12 @@ const TrackModules: React.FC<TrackModulesProps> = ({ timestampModules }) => {
                 </div>
 
                 {/* Module Statistics */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {Object.entries(moduleTypeStats).map(([type, count]) => (
                     <motion.div 
                       key={type}
                       whileHover={{ scale: 1.02 }}
-                      className="bg-white/[0.03] backdrop-blur-sm p-4 rounded-2xl border border-white/[0.05]"
+                      className="bg-white/[0.03] backdrop-blur-sm p-2 rounded-2xl border border-white/[0.05]"
                     >
                       <div className="flex items-center gap-3 mb-3">
                         <div className={`p-2 rounded-xl bg-gradient-to-r ${getModuleTypeColor(type)}`}>

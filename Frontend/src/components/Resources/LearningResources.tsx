@@ -1,4 +1,3 @@
-
 import {
   ChevronDown,
   ChevronUp,
@@ -134,7 +133,7 @@ const funFacts = [
     id: "f1",
     text: "The term 'algorithm' comes from Al-Khwarizmi",
     isTrue: true,
-    explanation: "Al-Khwarizmi’s algebra work inspired the term.",
+    explanation: "Al-Khwarizmi's algebra work inspired the term.",
   },
   {
     id: "f2",
@@ -278,7 +277,7 @@ export default function LearningResources() {
   const COLORS = ["#8884d8", "#82ca9d", "#ffc107"];
 
   return (
-    <section className="py-6 relative bg-gray-900">
+    <section className="py-6 relative bg-gray-900" style={{ maxWidth: 440, minWidth: 320, width: '100%' }}>
       <style>
         {`
           .roadmap-card:hover, .faq-card:hover, .fact-card:hover {
@@ -562,15 +561,8 @@ export default function LearningResources() {
                 </div>
                 {showQuizResult?.factId === fact.id && (
                   <div className="mt-4 p-3 bg-gray-900/50 rounded-lg">
-                    <p
-                      className={`text-base ${
-                        showQuizResult.isCorrect
-                          ? "text-green-400"
-                          : "text-red-400"
-                      }`}
-                    >
-                      {showQuizResult.isCorrect ? "Correct!" : "Incorrect!"}{" "}
-                      {fact.explanation}
+                    <p className={`text-base ${showQuizResult.isCorrect ? "text-green-400" : "text-red-400"}`}>
+                      {showQuizResult.isCorrect ? "Correct!" : "Incorrect!"} {fact.explanation}
                     </p>
                   </div>
                 )}
