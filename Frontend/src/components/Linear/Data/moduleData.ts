@@ -6,6 +6,7 @@ export type ModuleType =
   | 'Numerical Navigator';
 
 export interface ModuleData {
+  subject: any;
   timestamp(timestamp: any): unknown;
   id: string;
   type: ModuleType;
@@ -96,7 +97,8 @@ export const moduleData: ModuleData[] = [
     },
     timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
-    }
+    },
+    subject: undefined
   },
   {
     id: 'formula-1',
@@ -199,7 +201,8 @@ export const moduleData: ModuleData[] = [
     },
     timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
-    }
+    },
+    subject: undefined
   },
   {
     id: '3d-1',
@@ -286,7 +289,8 @@ export const moduleData: ModuleData[] = [
     },
     timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
-    }
+    },
+    subject: undefined
   },
   {
     id: 'proof-1',
@@ -364,7 +368,8 @@ export const moduleData: ModuleData[] = [
     },
     timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
-    }
+    },
+    subject: undefined
   },
   {
     id: 'numerical-1',
@@ -500,7 +505,8 @@ export const moduleData: ModuleData[] = [
     },
     timestamp: function (_timestamp: any): unknown {
       throw new Error("Function not implemented.");
-    }
+    },
+    subject: undefined
   }
 ];
 

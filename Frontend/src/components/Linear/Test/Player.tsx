@@ -1,6 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Clock, BookOpen } from 'lucide-react';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { 
+  Play, 
+  Pause, 
+  Clock, 
+  BookOpen, 
+  SkipForward, 
+  Volume2, 
+  VolumeX, 
+  Settings,
+  Maximize,
+  Minimize,
+  Download,
+  Share2,
+  AlertCircle,
+  CheckCircle2,
+  Loader
+} from 'lucide-react';
+import { toast } from 'react-toastify';
 
 // Types
 interface Timestamp {
@@ -32,7 +49,32 @@ interface TimestampModule {
 interface PlayerProps {
   onTimestampReached: (timestamp: Timestamp) => void;
   timestampModules: TimestampModule[];
+  videoData?: VideoData; // Optional prop for initial video data
+  setVideoData?: (data: VideoData) => void; // Optional setter for video data
 }
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.25, 0.1, 0.25, 1],
+    },
+  },
+};
 
 const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules }) => {
   const [videoData, setVideoData] = useState<VideoData | null>(null);
@@ -42,6 +84,11 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
   const [nextTimestampIndex, setNextTimestampIndex] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [volume, setVolume] = useState<number>(80);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+  const [playbackRate, setPlaybackRate] = useState<number>(1);
   
   const playerRef = useRef<any>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -51,53 +98,77 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
   useEffect(() => {
     const loadVideoData = () => {
       try {
-        // Extract video ID from localStorage
         const videoId = localStorage.getItem("currentVideoId") || "dQw4w9WgXcQ";
         
         const videoData: VideoData = {
           id: videoId,
-          title: 'Educational Physics Lecture - Mechanics and Thermodynamics',
-          artist: 'Dr. Physics Professor',
+          title: 'Advanced Physics: Quantum Mechanics & Thermodynamics',
+          artist: 'Dr. Sarah Chen - MIT Physics Department',
           duration: 300,
           timestamps: [
-            { time: 30, title: 'Introduction to Kinematics' },
-            { time: 75, title: 'Newton\'s Laws of Motion' },
-            { time: 120, title: 'Energy and Work' },
-            { time: 165, title: 'Thermodynamic Processes' },
-            { time: 210, title: 'Heat Transfer Mechanisms' },
-            { time: 255, title: 'Electromagnetic Fields' },
-            { time: 285, title: 'Quantum Mechanics Basics' }
+            { time: 30, title: 'Introduction to Quantum States' },
+            { time: 75, title: 'Wave-Particle Duality' },
+            { time: 120, title: 'Heisenberg Uncertainty Principle' },
+            { time: 165, title: 'Thermodynamic Laws' },
+            { time: 210, title: 'Statistical Mechanics' },
+            { time: 255, title: 'Quantum Entanglement' },
+            { time: 285, title: 'Applications in Modern Technology' }
           ]
         };
 
         setVideoData(videoData);
         setLoading(false);
-        console.log("Loaded video ID from localStorage:", videoId);
+        
+        toast.success(
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            <CheckCircle2 className="w-5 h-5 text-green-400" />
+            <span className="text-sm font-light">Video loaded successfully!</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
       } catch (err) {
         console.error("Error loading video data:", err);
         setError('Failed to load video data');
         setLoading(false);
+        
+        toast.error(
+          <motion.div
+            initial={{ opacity: 0, x: 100 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="flex items-center gap-3"
+          >
+            <AlertCircle className="w-5 h-5 text-red-400" />
+            <span className="text-sm font-light">Failed to load video</span>
+          </motion.div>,
+          { autoClose: 3000 }
+        );
       }
     };
 
     loadVideoData();
   }, []);
 
-  // Initialize YouTube player when videoData is ready
+  // Initialize YouTube player
   useEffect(() => {
     if (!videoData || !videoData.id || playerInitialized) return;
 
     const loadPlayer = () => {
       // @ts-ignore
       playerRef.current = new window.YT.Player('youtube-player', {
-        height: '360',
-        width: '640',
+        height: '100%',
+        width: '100%',
         videoId: videoData.id,
         playerVars: {
           playsinline: 1,
           enablejsapi: 1,
           origin: window.location.origin,
-          controls: 0
+          controls: 0,
+          modestbranding: 1,
+          rel: 0
         },
         events: {
           'onReady': onPlayerReady,
@@ -107,7 +178,8 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
       });
       setPlayerInitialized(true);
     };
-//@ts-ignore
+
+    // @ts-ignore
     if (!window.YT) {
       const tag = document.createElement('script');
       tag.src = 'https://www.youtube.com/iframe_api';
@@ -129,29 +201,21 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
       setPlayerInitialized(false);
     };
   }, [videoData]);
-    //@ts-ignore
+
   const onPlayerReady = (event: any) => {
     console.log("YouTube player ready for video:", videoData?.id);
-    // Set initial duration if available
-    if (videoData) {
-      //@ts-ignore
-      setDuration(videoData.duration);
-    }
+    event.target.setVolume(volume);
+    if (isMuted) event.target.mute();
   };
 
   const onPlayerStateChange = (event: any) => {
-    // Video ended
     if (event.data === 0) {
       setIsPlaying(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    // Playing
-    else if (event.data === 1) {
+    } else if (event.data === 1) {
       setIsPlaying(true);
       startProgressTracking();
-    }
-    // Paused
-    else if (event.data === 2) {
+    } else if (event.data === 2) {
       setIsPlaying(false);
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
@@ -180,13 +244,27 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
         const time = playerRef.current.getCurrentTime();
         setCurrentTime(time);
         
-        // Check if we've reached the next timestamp
         if (videoData && nextTimestampIndex < videoData.timestamps.length && 
             time >= videoData.timestamps[nextTimestampIndex].time) {
           playerRef.current.pauseVideo();
           setPausedAtTimestamp(videoData.timestamps[nextTimestampIndex].time);
           onTimestampReached(videoData.timestamps[nextTimestampIndex]);
           setNextTimestampIndex(nextTimestampIndex + 1);
+          
+          toast.info(
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="flex items-center gap-3"
+            >
+              <BookOpen className="w-5 h-5 text-blue-400" />
+              <div>
+                <p className="text-sm font-medium">Learning Module Activated!</p>
+                <p className="text-xs text-gray-300">{videoData.timestamps[nextTimestampIndex - 1].title}</p>
+              </div>
+            </motion.div>,
+            { autoClose: 5000 }
+          );
         }
       }
     }, 500);
@@ -213,7 +291,6 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
     if (playerRef.current) {
       playerRef.current.seekTo(newTime, true);
       
-      // Update next timestamp index based on new position
       let newIndex = 0;
       if (videoData) {
         for (let i = 0; i < videoData.timestamps.length; i++) {
@@ -235,7 +312,6 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
       setPausedAtTimestamp(time);
       playerRef.current.pauseVideo();
       
-      // Find the index of this timestamp
       if (videoData) {
         const index = videoData.timestamps.findIndex(ts => ts.time === time);
         if (index !== -1) {
@@ -243,6 +319,69 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
         }
       }
     }
+  };
+
+  const toggleMute = () => {
+    if (!playerRef.current) return;
+    
+    if (isMuted) {
+      playerRef.current.unMute();
+      setVolume(80);
+    } else {
+      playerRef.current.mute();
+      setVolume(0);
+    }
+    setIsMuted(!isMuted);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseInt(e.target.value);
+    setVolume(newVolume);
+    if (playerRef.current) {
+      playerRef.current.setVolume(newVolume);
+      setIsMuted(newVolume === 0);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    setIsFullscreen(!isFullscreen);
+    // In a real implementation, you'd handle fullscreen API here
+  };
+
+  const handlePlaybackRateChange = (rate: number) => {
+    setPlaybackRate(rate);
+    if (playerRef.current) {
+      playerRef.current.setPlaybackRate(rate);
+    }
+  };
+
+  const shareVideo = () => {
+    const shareData = {
+      title: videoData?.title || 'Educational Video',
+      text: 'Check out this educational video!',
+      url: `https://youtube.com/watch?v=${videoData?.id}`
+    };
+
+    if (navigator.share) {
+      navigator.share(shareData);
+    } else {
+      navigator.clipboard.writeText(shareData.url);
+      toast.success('Video URL copied to clipboard!');
+    }
+  };
+
+  const downloadTranscript = () => {
+    // Mock transcript download
+    const transcript = `Transcript for: ${videoData?.title}\n\nGenerated transcript content would go here...`;
+    const blob = new Blob([transcript], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${videoData?.title || 'video'}-transcript.txt`;
+    link.click();
+    URL.revokeObjectURL(url);
+    
+    toast.success('Transcript downloaded!');
   };
 
   const formatTime = (seconds: number): string => {
@@ -257,128 +396,285 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-        <p className="ml-4 text-purple-500">Loading player...</p>
-      </div>
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex items-center justify-center min-h-[400px] bg-white/[0.02] backdrop-blur-sm rounded-3xl border border-white/[0.05]"
+      >
+        <div className="text-center">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+            className="w-12 h-12 mx-auto mb-4"
+          >
+            <Loader className="w-full h-full text-purple-400" />
+          </motion.div>
+          <p className="text-purple-400 font-light">Loading advanced player...</p>
+        </div>
+      </motion.div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl p-6">
-        <div className="bg-red-500/20 p-6 rounded-xl max-w-md text-center">
-          <h3 className="text-red-200 font-bold text-xl mb-3">Error</h3>
-          <p className="text-red-100 mb-5">{error}</p>
-          <button 
-            className="px-6 py-3 bg-red-600 rounded-lg hover:bg-red-700 transition font-medium"
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center min-h-[400px] bg-white/[0.02] backdrop-blur-sm rounded-3xl border border-red-500/20 p-8"
+      >
+        <div className="text-center max-w-md">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <h3 className="text-red-200 font-bold text-xl mb-3">Player Error</h3>
+          <p className="text-red-100 mb-6 font-light">{error}</p>
+          <motion.button 
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-xl transition font-medium"
             onClick={() => window.location.reload()}
           >
-            Try Again
-          </button>
+            Retry Loading
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   if (!videoData) {
     return (
-      <div className="flex items-center justify-center min-h-[300px] bg-gray-800/50 rounded-xl p-6">
-        <div className="bg-yellow-500/20 p-6 rounded-xl max-w-md text-center">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center justify-center min-h-[400px] bg-white/[0.02] backdrop-blur-sm rounded-3xl border border-yellow-500/20 p-8"
+      >
+        <div className="text-center max-w-md">
+          <AlertCircle className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
           <h3 className="text-yellow-200 font-bold text-xl mb-3">No Video Data</h3>
-          <p className="text-yellow-100 mb-5">Could not load video information</p>
+          <p className="text-yellow-100 mb-6 font-light">Could not load video information</p>
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="w-full">
-      {/* Video Player */}
+    <motion.div 
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full space-y-6"
+    >
+      {/* Video Player Container */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-2xl"
+        variants={itemVariants}
+        className={`relative bg-white/[0.02] backdrop-blur-sm rounded-3xl overflow-hidden border border-white/[0.05] shadow-2xl ${
+          isFullscreen ? 'fixed inset-4 z-50' : ''
+        }`}
       >
-        <div className="p-4">
-          <div className="bg-black rounded-xl overflow-hidden shadow-lg relative">
-            <div id="youtube-player" className="w-full aspect-video" />
-            
-            {/* Video Info Overlay */}
-            <div className="absolute bottom-4 left-4 right-4 bg-black/70 p-3 rounded-lg">
-              <h2 className="text-lg font-bold truncate">{videoData.title}</h2>
-              <p className="text-gray-400 text-sm">{videoData.artist}</p>
-              <p className="text-gray-500 text-xs mt-1">Video ID: {videoData.id}</p>
+        {/* Video Player */}
+        <div className="relative bg-black rounded-3xl overflow-hidden">
+          <div id="youtube-player" className="w-full aspect-video" />
+          
+          {/* Video Overlay Controls */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute bottom-6 left-6 right-6">
+              <div className="flex items-end justify-between mb-4">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-xl font-bold text-white truncate">{videoData.title}</h2>
+                  <p className="text-gray-300 text-sm font-light">{videoData.artist}</p>
+                  <p className="text-gray-400 text-xs mt-1">Video ID: {videoData.id}</p>
+                </div>
+                
+                <div className="flex items-center gap-2 ml-4">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={shareVideo}
+                    className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                  >
+                    <Share2 className="w-4 h-4 text-white" />
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={downloadTranscript}
+                    className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                  >
+                    <Download className="w-4 h-4 text-white" />
+                  </motion.button>
+                  
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={toggleFullscreen}
+                    className="p-2 bg-white/20 backdrop-blur-sm rounded-lg hover:bg-white/30 transition-colors"
+                  >
+                    {isFullscreen ? <Minimize className="w-4 h-4 text-white" /> : <Maximize className="w-4 h-4 text-white" />}
+                  </motion.button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Player Controls */}
-        <div className="p-4 bg-gray-900/50">
-          <div className="flex flex-col md:flex-row md:items-center gap-4 mb-4">
-            <div className="flex-1">
-              <h2 className="text-xl font-bold truncate">{videoData.title}</h2>
-              <p className="text-gray-400">{videoData.artist}</p>
+        {/* Enhanced Player Controls */}
+        <div className="p-6 bg-white/[0.02] backdrop-blur-sm border-t border-white/[0.05]">
+          {/* Progress Bar */}
+          <div className="mb-6">
+            <div className="flex justify-between text-sm text-white/60 mb-2 font-light">
+              <span>{formatTime(currentTime)}</span>
+              <span>{formatTime(videoData.duration)}</span>
             </div>
-            
+            <div className="relative">
+              <input
+                type="range"
+                min="0"
+                max={videoData.duration}
+                value={currentTime}
+                onChange={handleSeek}
+                className="w-full h-2 bg-white/10 rounded-full appearance-none cursor-pointer accent-purple-500 hover:accent-purple-400 transition-colors"
+              />
+              {/* Progress indicators for timestamps */}
+              {videoData.timestamps.map((ts, index) => (
+                <div
+                  key={index}
+                  className="absolute top-0 w-1 h-2 bg-yellow-400 rounded-full transform -translate-x-1/2"
+                  style={{ left: `${(ts.time / videoData.duration) * 100}%` }}
+                  title={ts.title}
+                />
+              ))}
+            </div>
+          </div>
+          
+          {/* Control Buttons */}
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                onClick={() => playerRef.current?.seekTo(Math.max(0, currentTime - 10), true)}
+                className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
+              >
+                <SkipForward className="h-5 w-5 text-white transform rotate-180" />
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
                 onClick={togglePlayPause}
-                className={`p-3 rounded-full ${
+                className={`p-4 rounded-xl transition-all shadow-lg ${
                   isPlaying 
                     ? 'bg-red-600 hover:bg-red-700' 
                     : 'bg-green-600 hover:bg-green-700'
-                } transition-colors shadow-lg`}
+                }`}
               >
                 {isPlaying ? <Pause className="h-6 w-6 text-white" /> : <Play className="h-6 w-6 text-white" />}
               </motion.button>
               
-              <div className="flex items-center gap-2 text-gray-300">
-                <Clock size={16} />
-                <span>{formatTime(currentTime)}</span>
-                <span>/</span>
-                <span>{formatTime(videoData.duration)}</span>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => playerRef.current?.seekTo(Math.min(videoData.duration, currentTime + 10), true)}
+                className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-colors"
+              >
+                <SkipForward className="h-5 w-5 text-white" />
+              </motion.button>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              {/* Volume Control */}
+              <div className="flex items-center gap-2">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={toggleMute}
+                  className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  {isMuted ? <VolumeX className="h-4 w-4 text-white" /> : <Volume2 className="h-4 w-4 text-white" />}
+                </motion.button>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={volume}
+                  onChange={handleVolumeChange}
+                  className="w-20 h-1 bg-white/20 rounded-full appearance-none cursor-pointer accent-purple-500"
+                />
+              </div>
+              
+              {/* Playback Rate */}
+              <div className="relative">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="p-2 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  <Settings className="h-4 w-4 text-white" />
+                </motion.button>
+                
+                <AnimatePresence>
+                  {showSettings && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 10, scale: 0.9 }}
+                      className="absolute bottom-full right-0 mb-2 bg-white/10 backdrop-blur-xl rounded-xl border border-white/20 p-4 min-w-[200px]"
+                    >
+                      <h4 className="text-white font-medium mb-3">Playback Settings</h4>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-white/70 text-sm block mb-1">Speed</label>
+                          <div className="grid grid-cols-4 gap-1">
+                            {[0.5, 0.75, 1, 1.25, 1.5, 2].map(rate => (
+                              <button
+                                key={rate}
+                                onClick={() => handlePlaybackRateChange(rate)}
+                                className={`px-2 py-1 text-xs rounded transition-colors ${
+                                  playbackRate === rate 
+                                    ? 'bg-purple-600 text-white' 
+                                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                                }`}
+                              >
+                                {rate}x
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
           
-          <input
-            type="range"
-            min="0"
-            max={videoData.duration}
-            value={currentTime}
-            onChange={handleSeek}
-            className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
-          />
-          
+          {/* Timestamp Pause Notification */}
           <AnimatePresence>
             {pausedAtTimestamp !== null && (
               <motion.div 
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="mt-4 p-4 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-700 rounded-lg"
+                exit={{ opacity: 0, y: -20 }}
+                className="mt-6 p-4 bg-gradient-to-r from-purple-900/30 to-indigo-900/30 border border-purple-500/30 rounded-2xl backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-purple-600 rounded-full">
-                      <BookOpen size={16} className="text-white" />
+                    <div className="p-2 bg-purple-600 rounded-xl">
+                      <BookOpen className="w-5 h-5 text-white" />
                     </div>
                     <div>
                       <p className="text-purple-300 font-medium">Learning Module Activated!</p>
-                      <p className="text-purple-200 text-sm">Paused at {formatTime(pausedAtTimestamp)}</p>
+                      <p className="text-purple-200 text-sm font-light">Paused at {formatTime(pausedAtTimestamp)}</p>
                     </div>
                   </div>
                   <motion.button 
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={togglePlayPause}
-                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-medium"
+                    className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl font-medium transition-colors"
                   >
-                    <Play size={16} />
-                    Continue
+                    <Play className="w-4 h-4" />
+                    Continue Learning
                   </motion.button>
                 </div>
               </motion.div>
@@ -389,100 +685,130 @@ const Player: React.FC<PlayerProps> = ({ onTimestampReached, timestampModules })
       
       {/* Enhanced Timestamps Section */}
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mt-8 bg-gray-800/50 backdrop-blur-sm rounded-xl overflow-hidden shadow-xl"
+        variants={itemVariants}
+        className="bg-white/[0.02] backdrop-blur-sm rounded-3xl overflow-hidden border border-white/[0.05] shadow-2xl"
       >
-        <div className="p-4 bg-gray-900 border-b border-gray-700">
-          <h2 className="text-xl font-bold flex items-center gap-2">
-            <Clock className="h-5 w-5 text-purple-400" />
-            Learning Timestamps & Modules
-          </h2>
-          <p className="text-gray-400 text-sm mt-1">Each timestamp triggers a different educational module</p>
+        <div className="p-6 bg-white/[0.02] border-b border-white/[0.05]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-light text-white flex items-center gap-3">
+                <Clock className="h-6 w-6 text-purple-400" />
+                Learning Timeline
+              </h2>
+              <p className="text-white/60 text-sm mt-1 font-light">Interactive modules triggered at specific timestamps</p>
+            </div>
+            <div className="text-right">
+              <p className="text-white/40 text-sm">Progress</p>
+              <p className="text-white font-medium">{nextTimestampIndex}/{videoData.timestamps.length}</p>
+            </div>
+          </div>
         </div>
         
-        <div className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-          {videoData.timestamps.map((ts, index) => {
-            const module = getModuleForTimestamp(ts.time);
-            
-            return (
-              <motion.div 
-                key={index}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                className={`p-4 rounded-lg cursor-pointer transition-all ${
-                  index === nextTimestampIndex
-                    ? 'bg-purple-900/50 border-2 border-purple-500 shadow-lg'
-                    : index < nextTimestampIndex
-                      ? 'bg-green-900/20 border border-green-700/50'
-                      : 'bg-gray-700/50 hover:bg-gray-700 border border-gray-600/50'
-                }`}
-                onClick={() => jumpToTimestamp(ts.time)}
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <h3 className={`font-bold ${
-                      index === nextTimestampIndex 
-                        ? 'text-purple-300' 
-                        : index < nextTimestampIndex 
-                          ? 'text-green-300' 
-                          : 'text-gray-300'
-                    }`}>
-                      {ts.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm">{formatTime(ts.time)}</p>
-                  </div>
-                  <div className="text-right">
-                    {index === nextTimestampIndex ? (
-                      <span className="bg-purple-700 text-purple-200 px-2 py-1 rounded-full text-xs">Next</span>
-                    ) : index < nextTimestampIndex ? (
-                      <span className="bg-green-700/50 text-green-300 px-2 py-1 rounded-full text-xs">Completed</span>
-                    ) : null}
-                  </div>
-                </div>
-                
-                {module && (
-                  <motion.div 
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="mt-3 p-3 bg-gray-800/50 rounded-lg border border-gray-600/30"
-                  >
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-lg">{module.icon}</span>
-                      <div>
-                        <p className="text-white font-medium text-sm">{module.title}</p>
-                        <p className="text-gray-400 text-xs">{module.type}</p>
+        <div className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {videoData.timestamps.map((ts, index) => {
+              const module = getModuleForTimestamp(ts.time);
+              const isNext = index === nextTimestampIndex;
+              const isCompleted = index < nextTimestampIndex;
+              
+              return (
+                <motion.div 
+                  key={index}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`relative p-4 rounded-2xl cursor-pointer transition-all duration-300 overflow-hidden ${
+                    isNext
+                      ? 'bg-purple-900/30 border-2 border-purple-500/50 shadow-lg shadow-purple-500/20'
+                      : isCompleted
+                        ? 'bg-green-900/20 border border-green-500/30'
+                        : 'bg-white/[0.02] hover:bg-white/[0.05] border border-white/[0.05]'
+                  }`}
+                  onClick={() => jumpToTimestamp(ts.time)}
+                >
+                  {/* Background gradient */}
+                  <div className={`absolute inset-0 opacity-10 ${
+                    isNext ? 'bg-gradient-to-br from-purple-400 to-pink-400' :
+                    isCompleted ? 'bg-gradient-to-br from-green-400 to-blue-400' :
+                    'bg-gradient-to-br from-gray-400 to-gray-600'
+                  }`} />
+                  
+                  <div className="relative z-10">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h3 className={`font-medium text-lg ${
+                          isNext ? 'text-purple-300' : 
+                          isCompleted ? 'text-green-300' : 
+                          'text-white'
+                        }`}>
+                          {ts.title}
+                        </h3>
+                        <p className="text-white/60 text-sm font-light">{formatTime(ts.time)}</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {isNext && (
+                          <span className="bg-purple-600 text-purple-200 px-3 py-1 rounded-full text-xs font-medium">
+                            Next
+                          </span>
+                        )}
+                        {isCompleted && (
+                          <span className="bg-green-600/50 text-green-300 px-3 py-1 rounded-full text-xs font-medium">
+                            ✓ Completed
+                          </span>
+                        )}
                       </div>
                     </div>
-                    <p className="text-gray-300 text-xs line-clamp-2">{module.description}</p>
-                  </motion.div>
-                )}
-              </motion.div>
-            );
-          })}
+                    
+                    {module && (
+                      <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="p-3 bg-white/[0.05] backdrop-blur-sm rounded-xl border border-white/[0.1]"
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <span className="text-2xl">{module.icon}</span>
+                          <div>
+                            <p className="text-white font-medium text-sm">{module.title}</p>
+                            <p className="text-white/60 text-xs">{module.type}</p>
+                          </div>
+                        </div>
+                        <p className="text-white/70 text-xs line-clamp-2 font-light">{module.description}</p>
+                      </motion.div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
       </motion.div>
       
-      <div className="mt-4 text-center text-gray-500 text-sm">
-        <p>Playing video from localStorage: {videoData.id}</p>
-        <p className="text-gray-600 mt-1">
-          To change the video, update the "videoId" in localStorage
+      {/* Video Info Footer */}
+      <motion.div 
+        variants={itemVariants}
+        className="text-center p-4 bg-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/[0.05]"
+      >
+        <p className="text-white/60 text-sm font-light">
+          Currently playing: <span className="text-white font-medium">{videoData.id}</span>
         </p>
-        <button
-          className="mt-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+        <p className="text-white/40 text-xs mt-1">
+          Video loaded from localStorage • Enhanced with interactive learning modules
+        </p>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="mt-3 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-medium transition-colors"
           onClick={() => {
             const newVideoId = prompt("Enter new YouTube video ID:");
             if (newVideoId) {
-              localStorage.setItem("videoId", newVideoId);
+              localStorage.setItem("currentVideoId", newVideoId);
               window.location.reload();
             }
           }}
         >
           Change Video
-        </button>
-      </div>
-    </div>
+        </motion.button>
+      </motion.div>
+    </motion.div>
   );
 };
 
